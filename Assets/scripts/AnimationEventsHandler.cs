@@ -10,10 +10,15 @@ public class AnimationEventsHandler: MonoBehaviour
     {
         playerController = GetComponentInParent<PlayerController>();
     }
+
+    public void Attack51EffectiveCallback()
+    {
+        playerController.onAttackBecomeEffective();
+    }
     
     public void Attach51FinishCallback()
     {
-
+        playerController.onAttackFinish();
     }
 
     public void Attach2FinishCallback()

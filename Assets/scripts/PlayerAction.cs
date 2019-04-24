@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.ConstrainedExecution;
 using UnityEngine;
 
 public class PlayerAction
@@ -16,24 +15,31 @@ public class PlayerAction
     public GameObject target;
     public String spellName;
 
+    public float expireTime;
+
     private static PlayerAction cachedRuleAction = null;
+    private static PlayerAction cachedReadyAction = null;
+
+    private PlayerAction(){}
     
+    private PlayerAction(string actionName, bool isEvaluated, bool tryInterrupt, bool isInterrupbitle)
+    {
+        this.actionName = actionName;
+        this.isEvaluated = isEvaluated;
+        this.tryInterrupt = tryInterrupt;
+        this.isInterrupbitle = isInterrupbitle;
+    }
+
     public static PlayerAction createPlayerMoveAction(Vector3 userSpecifiedDestination)
     {
-        PlayerAction moveAction = new PlayerAction();
-        moveAction.actionName = "move";
-        moveAction.tryInterrupt = true;
-        moveAction.isInterrupbitle = true;
+        PlayerAction moveAction = new PlayerAction("move", true, true, true);
         moveAction.userSpecifiedDestination = userSpecifiedDestination;
         return moveAction;
     }
     
     public static PlayerAction createPlayerMoveToMovingTargetAction(GameObject movingTarget)
     {
-        PlayerAction moveToMovingTargetAction = new PlayerAction();
-        moveToMovingTargetAction.actionName = "move_to_moving_target";
-        moveToMovingTargetAction.tryInterrupt = true;
-        moveToMovingTargetAction.isInterrupbitle = true;
+        PlayerAction moveToMovingTargetAction = new PlayerAction("move_to_moving_target", true, true, true);
         moveToMovingTargetAction.target = movingTarget;
         return moveToMovingTargetAction;
     }
@@ -42,10 +48,7 @@ public class PlayerAction
     {
         if (cachedRuleAction == null)
         {
-            PlayerAction ruleAction = new PlayerAction();
-            ruleAction.actionName = "rule_action";
-            ruleAction.isEvaluated = false;
-            ruleAction.tryInterrupt = false;
+            PlayerAction ruleAction = new PlayerAction("rule_action", false, false, false);
             cachedRuleAction = ruleAction;
             return ruleAction;
         }
@@ -56,9 +59,21 @@ public class PlayerAction
 
     }
 
-    public static PlayerAction createMeleeAttackAction()
+    public static PlayerAction createMeleeAttackAction(GameObject target, String spellName, bool tryInterrupt = false)
     {
-        return null;
+        PlayerAction meleeAttackAction = new PlayerAction("melee_attack", true, tryInterrupt, false);
+        meleeAttackAction.target = target;
+        meleeAttackAction.spellName = spellName;
+        return meleeAttackAction;
+    }
+
+    public static PlayerAction createWaitAction(float waitTime)
+    {
+        PlayerAction waitAction = new PlayerAction();
+        waitAction.actionName = "wait_action";
+        waitAction.isInterrupbitle = false;
+        waitAction.expireTime = Time.time + waitTime;
+        return waitAction;
     }
     
 }

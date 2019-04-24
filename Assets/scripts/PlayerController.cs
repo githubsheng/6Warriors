@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -6,28 +6,43 @@ public class PlayerController : MonoBehaviour
 {
     public GameObject body;
     public GameObject navDestinationPrefab;
-    
-    private GameObject navDestination;
-    private NavMeshAgent agent;
-    private Animator animator;
 
-    private PlayerAction pendingAction;
-    private PlayerAction actionInExecution;
-    private GameObject defaultTarget;
-    private bool isTouchingDefaultTarget;
+    private GameObject _none;
+    private GameObject _navDestination;
+    private NavMeshAgent _agent;
+    private Animator _animator;
+
+    private PlayerAction _pendingAction;
+    private PlayerAction _actionInExecution;
+    private GameObject _currentTarget;
+    private HashSet<Collider> _inContacts;
+
+    private const float NavDestColliderTransHeight = 1.5f;
     
-    private static readonly int IsRunning = Animator.StringToHash("isRunning");
-    private static readonly int IsAttacking = Animator.StringToHash("isAttacking");
-    private const float navDestColliderTransHeight = 1.5f;
+    private float _nextActionTime = 0.0f;
+    private float _period = 5f;
 
     void Start()
     {
-        animator = body.GetComponent<Animator>();
-        agent = GetComponent<NavMeshAgent>();
+        _inContacts = new HashSet<Collider>();
+        _none = new GameObject();
+        _currentTarget = _none;
+        _animator = body.GetComponent<Animator>();
+        _agent = GetComponent<NavMeshAgent>();
     }
 
     void Update()
-    {   
+    {
+        if (Time.time > _nextActionTime)
+        {
+            _nextActionTime += _period;
+            if (_actionInExecution != null)
+            {
+                Debug.Log(_actionInExecution.actionName);                
+            }
+
+        }
+
         if (Input.GetMouseButtonDown(0))
         {
             //check what kind of stuffs the user clicks on. is it a mob, a place or some other stuffs
@@ -37,7 +52,7 @@ public class PlayerController : MonoBehaviour
                 if (hit.collider.CompareTag("small_mob"))
                 {
                     //clicked on a mob
-                    setDefaultTarget(hit.collider.gameObject);
+                    setCurrentTarget(hit.collider.gameObject);
                 }
                 else
                 {
@@ -47,48 +62,73 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        PlayerAction nextAction = getNextAction();
-        //check if we need to execute another action
-        if (this.actionInExecution == null || (this.actionInExecution.isInterrupbitle && nextAction.tryInterrupt))
+
+
+        if (_actionInExecution != null
+            && _actionInExecution.actionName == "wait_action")
         {
-            //todo: try to end the current action (if any clean up needs to be done), use a method instead
-            this.actionInExecution = nextAction;
-            this.pendingAction = null;
-            if (!actionInExecution.isEvaluated)
+            if (_actionInExecution.expireTime < Time.time)
             {
-                this.actionInExecution = evaluateRuleAction();
-                this.executeAction(this.actionInExecution);
+                _actionInExecution = null;
             }
+        }
+        
+        PlayerAction nextAction = getNextAction();
+        
+        //check if we need to execute another action
+        if (_actionInExecution == null || (_actionInExecution.isInterrupbitle && nextAction.tryInterrupt))
+        {
+            endAction(_actionInExecution);
+            _actionInExecution = nextAction;
+            _pendingAction = null;
+            if (!_actionInExecution.isEvaluated)
+            {
+                _actionInExecution = evaluateRuleAction();
+                if (_actionInExecution == null) return;
+            }
+            executeAction(_actionInExecution);
         } 
         
         //if not, continue execute the current action
-        
-        //todo: continuously execute the current action, im thinking of creating another method other than executeAction
+        continousExecuteAction(_actionInExecution);
+    }
+
+    /**
+     * try to end the current action (if any clean up needs to be done)
+     */
+    private void endAction(PlayerAction playerAction)
+    {
+        //todo: implement.
     }
 
     private PlayerAction evaluateRuleAction()
-    {
-        //todo: use the group action rules to evaluate a complete action, right now im simply trying to do a melee attack
-        if (isTouchingDefaultTarget)
-        {
-            //within range, generate an attack action
-            return PlayerAction.createMeleeAttackAction();            
-        }
-        else
-        {
-            //we have to move the player to the mob first. then after that, based on the group rule or pending action, player will do other stuff
-            return PlayerAction.createPlayerMoveToMovingTargetAction(defaultTarget);
-        }
-        
+    {        
+        /*
+         * todo: rules:
+         * if no target then find a target
+         * if nothing can be target, then stay ready
+         */
 
+        //todo: this is a simplified rule for testing only
+        if (_currentTarget != _none)
+        {
+            if (_inContacts.Contains(_currentTarget.GetComponent<Collider>()))
+            {
+                //within range, generate an attack action
+                return PlayerAction.createMeleeAttackAction(_currentTarget, "normal_attack");                            
+            }
+
+            return PlayerAction.createPlayerMoveToMovingTargetAction(_currentTarget);
+        }
+
+        return null;
     }
 
     private PlayerAction getNextAction()
     {
-        if (this.pendingAction != null)
+        if (_pendingAction != null)
         {
-            PlayerAction ret = this.pendingAction;
-            this.pendingAction = null;
+            PlayerAction ret = _pendingAction;
             return ret;
         }
 
@@ -97,22 +137,16 @@ public class PlayerController : MonoBehaviour
 
     private void executeAction(PlayerAction playerAction)
     {
-        if (!playerAction.isEvaluated)
-        {
-            //first we need to evaluate this player action
-            Debug.Log("evaluate the player action first");
-            Debug.Log("may need to evaluate all the rules and decide what the action actually should be");
-        }
-        
         switch (playerAction.actionName)
         {
             case "move":
-                Debug.Log("getting a move player action");
-                actionInExecution = playerAction;
-                MoveAgentToPlace(playerAction);
+                moveAgentToPlace(playerAction);
+                break;
+            case "move_to_moving_target":
+                moveAgentToTarget(playerAction);
                 break;
             case "melee_attack":
-                Debug.Log("a melee attack action");
+                startAttack(playerAction);
                 break;
             default:
                 break;
@@ -123,97 +157,103 @@ public class PlayerController : MonoBehaviour
     {
         /*
          * todo: for some certain actions such as move to moving target action, we need to continue checking the target's
-         * todo: position periodically.
+         * for now, all targets are static so we can get by....
          */
-        Debug.Log("continue executing some certain action");
     }
     
     private void setMoveAction(Vector3 userSpecifiedMoveDestination)
     {
         PlayerAction moveAction = PlayerAction.createPlayerMoveAction(userSpecifiedMoveDestination);
-        if (actionInExecution.isInterrupbitle) executeAction(moveAction);
+        _pendingAction = moveAction;
+    }
+    
+    private void setCurrentTarget(GameObject target)
+    {
+        _currentTarget = target;
+        
     }
 
-    private void MoveAgentToPlace(PlayerAction moveAction)
+    private void resetCurrentTarget()
     {
-        if (navDestination != null) Destroy(navDestination);
-        agent.isStopped = false;
-        agent.destination = moveAction.userSpecifiedDestination;
+        _currentTarget = _none;
+    }
+
+    private void moveAgentToPlace(PlayerAction moveAction)
+    {
+        resetCurrentTarget();
+        if (_navDestination) Destroy(_navDestination);
+        _agent.isStopped = false;
+        _agent.destination = moveAction.userSpecifiedDestination;
         /*
         https://docs.unity3d.com/ScriptReference/AI.NavMeshAgent-destination.html
         the destination could be different from hit.point, if the hit.point is not reachable, then destination will be
         the closest reachable point
          */
-        Vector3 actualDestination = agent.destination;
+        Vector3 actualDestination = _agent.destination;
         Vector3 navDestinationTransform = new Vector3(
             actualDestination.x,
-            navDestColliderTransHeight + actualDestination.y,
+            NavDestColliderTransHeight + actualDestination.y,
             actualDestination.z
         );
-        navDestination = Instantiate(navDestinationPrefab, navDestinationTransform, Quaternion.identity);
-        animator.SetBool(IsRunning, true);
+        _navDestination = Instantiate(navDestinationPrefab, navDestinationTransform, Quaternion.identity);
+        _animator.SetInteger(AnimationStatus.AniStat, AnimationStatus.Run22);
     }
 
-    private void setDefaultTarget(GameObject target)
+    private void moveAgentToTarget(PlayerAction moveToTargetAction)
     {
-        this.defaultTarget = target;
+        if (_navDestination) Destroy(_navDestination);
+        _agent.isStopped = false;
+        _agent.destination = moveToTargetAction.target.transform.position;
+        _animator.SetInteger(AnimationStatus.AniStat, AnimationStatus.Run22);
     }
 
-//    private void MoveAgentBak()
-//    {
-//        RaycastHit hit;
-//        if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 100))
-//        {
-//            if (hit.collider.CompareTag("small_mob"))
-//            {
-//                //clicked on a mob
-//                if (navDestination != null) Destroy(navDestination);
-//                agent.isStopped = false;
-//                agent.destination = hit.collider.transform.position;
-//            }
-//            else
-//            {
-//                //clicked on a place
-//
-//            }
-//
-//
-//
-//        }
-//    }
+    private void startAttack(PlayerAction playerAction)
+    {
+        _animator.SetInteger(AnimationStatus.AniStat, AnimationStatus.Attack51);
+    }
+
+    public void onAttackBecomeEffective()
+    {
+        //todo: 
+    }
+
+    public void onAttackFinish()
+    {
+        _animator.SetInteger(AnimationStatus.AniStat, AnimationStatus.Ready56);
+        _actionInExecution = PlayerAction.createWaitAction(0.5f);
+    }
 
     void OnTriggerEnter(Collider other)
     {
-      
-        if (other.CompareTag("player_nav_destination"))
+        _inContacts.Add(other);
+       
+        
+        switch (_actionInExecution.actionName)
         {
-            Destroy(navDestination);
-            navDestination = null;
-            agent.isStopped = true;
-            animator.SetBool(IsRunning, false);
-        } else if (other.CompareTag("small_mob"))
-        {
-            if (other.gameObject == defaultTarget)
-            {
-                isTouchingDefaultTarget = true;                
-            }
-            
-            //todo: following logic is only for player moving to a mob, we need to refine it, as trigger detection is used in many other cases as well
-            //stop the agent and start attacking!
-            Debug.Log("hitting a mob collider!");
-            agent.isStopped = true;
-            animator.SetBool(IsRunning, false);
+            case "move":
+                if (other.CompareTag("player_nav_destination"))
+                {
+                    Destroy(_navDestination);
+                    _agent.isStopped = true;
+                    _animator.SetInteger(AnimationStatus.AniStat, AnimationStatus.Ready56);
+                    _actionInExecution = PlayerAction.createWaitAction(0.2f);
+                }
+                break;
+            case "move_to_moving_target":
+                if (other.gameObject == _actionInExecution.target)
+                {
+                    _agent.isStopped = true;
+                    _animator.SetInteger(AnimationStatus.AniStat, AnimationStatus.Ready56);
+                    _actionInExecution = PlayerAction.createWaitAction(0.2f);
+                }
+                break;
+            default:
+                break;
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("small_mob"))
-        {
-            if (other.gameObject == defaultTarget)
-            {
-                isTouchingDefaultTarget = false;                
-            }
-        }
+        _inContacts.Remove(other);
     }
 }
