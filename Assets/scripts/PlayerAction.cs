@@ -13,7 +13,7 @@ public class PlayerAction
     
     //following props are for attacking / casting spells
     public GameObject target;
-    public String spellName;
+    public Spell spell;
 
     public float expireTime;
 
@@ -56,14 +56,13 @@ public class PlayerAction
         {
             return cachedRuleAction;
         }
-
     }
 
-    public static PlayerAction createMeleeAttackAction(GameObject target, String spellName, bool tryInterrupt = false)
+    public static PlayerAction createSpellAction(GameObject target, Spell spell, bool tryInterrupt = false)
     {
         PlayerAction meleeAttackAction = new PlayerAction("melee_attack", true, tryInterrupt, false);
         meleeAttackAction.target = target;
-        meleeAttackAction.spellName = spellName;
+        meleeAttackAction.spell = spell;
         return meleeAttackAction;
     }
 
