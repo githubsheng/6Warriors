@@ -3,7 +3,7 @@
 using System;
 using UnityEngine;
 
-public class PlayerBuff
+public class CharacterBuff
 {
     //these are one time effects, ie, only applied once
     public int maxHpChange;
@@ -34,7 +34,15 @@ public class PlayerBuff
     public float durationInSeconds;
     public float buffExpireTime;
     public float nextEffectiveTime;
-    
+
+    public CharacterBuff(string name, string buffIconName, bool isDebuff, string explaination, float durationInSeconds)
+    {
+        this.name = name;
+        this.buffIconName = buffIconName;
+        this.isDebuff = isDebuff;
+        this.explaination = explaination;
+        this.durationInSeconds = durationInSeconds;
+    }
 
     public bool isExpired()
     {

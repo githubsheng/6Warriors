@@ -2,10 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Spells;
 using UnityEngine;
 using Random = System.Random;
 
-public class PlayerStatus
+public class CharacterStatus
 {
 
     public int maxBaseHp;
@@ -41,12 +42,12 @@ public class PlayerStatus
     private float _expectedNextEvaluationTime;
 
     //includes debuffs
-    public List<PlayerBuff> buffs = new List<PlayerBuff>();
+    public List<CharacterBuff> buffs = new List<CharacterBuff>();
     
     private Random _random = new Random();
     
     
-    public PlayerStatus(int maxBaseHp, int maxBaseMana)
+    public CharacterStatus(int maxBaseHp, int maxBaseMana)
     {
         hp = maxBaseHp;
         mana = maxBaseMana;
@@ -108,7 +109,7 @@ public class PlayerStatus
 
     private void resetStatus()
     {
-        buffs = new List<PlayerBuff>();
+        buffs = new List<CharacterBuff>();
         //todo:
     } 
 
@@ -124,35 +125,35 @@ public class PlayerStatus
         int dotDamage = 0;
         int manaBurned = 0;
 
-        List<PlayerBuff> validBuffs = new List<PlayerBuff>(buffs.Count);
+        List<CharacterBuff> validBuffs = new List<CharacterBuff>(buffs.Count);
 
         for (int i = 0; i < buffs.Count; i++)
         {
-            PlayerBuff playerBuff = buffs[i];
-            if (playerBuff.isExpired())
+            CharacterBuff characterBuff = buffs[i];
+            if (characterBuff.isExpired())
             {
                 //this buff has expired, we need to revert all the effects of this buff
-                maxHp -= playerBuff.maxHpChange;
-                maxMana -= playerBuff.maxManaChange;
-                armor -= playerBuff.armorChange;
-                magicResistence -= playerBuff.magicResistenceChange;
-                fireResistence -= playerBuff.fireResistenceChange;
-                iceResistence -= playerBuff.iceResistenceChange;
-                attackStrengh -= playerBuff.attackStrenghChange;
-                magicPower -= playerBuff.magicPowerChange;
-                dodgeChance -= playerBuff.dodgeChanceChange;
+                maxHp -= characterBuff.maxHpChange;
+                maxMana -= characterBuff.maxManaChange;
+                armor -= characterBuff.armorChange;
+                magicResistence -= characterBuff.magicResistenceChange;
+                fireResistence -= characterBuff.fireResistenceChange;
+                iceResistence -= characterBuff.iceResistenceChange;
+                attackStrengh -= characterBuff.attackStrenghChange;
+                magicPower -= characterBuff.magicPowerChange;
+                dodgeChance -= characterBuff.dodgeChanceChange;
             }
             else
             {
-                if (playerBuff.isEffective())
+                if (characterBuff.isEffective())
                 {
-                    hpIncrease += playerBuff.hpIncrease;
-                    manaIncrease += playerBuff.manaIncrease;
-                    dotDamage += playerBuff.hpDecrease;
-                    manaBurned += playerBuff.manaDecrease;
-                    playerBuff.updateNextEffectiveTime();
+                    hpIncrease += characterBuff.hpIncrease;
+                    manaIncrease += characterBuff.manaIncrease;
+                    dotDamage += characterBuff.hpDecrease;
+                    manaBurned += characterBuff.manaDecrease;
+                    characterBuff.updateNextEffectiveTime();
                 }
-                validBuffs.Add(playerBuff);
+                validBuffs.Add(characterBuff);
             }
         }
 
