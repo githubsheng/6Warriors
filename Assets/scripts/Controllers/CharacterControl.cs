@@ -1,5 +1,6 @@
 ﻿using Actions;
 using Animations;
+using Spells;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -7,29 +8,41 @@ namespace Controllers
 {
     public class CharacterControl : MonoBehaviour
     {
-        public GameObject body;
+        public GameObject _self;
         public GameObject navDestinationPrefab;
     
         private NavMeshAgent _agent;
         private Animator _animator;
     
         private const float NavDestColliderTransHeight = 1.5f;
-        private ActionRulesEngine _actionRules;
+        private ActionRulesEngine _rulesEngine;
+
+        private CharacterStatus _characterStatus;
         
-        
-        
+        //following are used to instantiate the characters status
+        public int maxBaseHp;
+        public int maxBaseMana;
+        public int baseAttackStrengh;
+        public int baseMagicPower;
     
         void Start()
         {
-            _animator = body.GetComponent<Animator>();
+            _animator = _self.GetComponent<Animator>();
             _agent = GetComponent<NavMeshAgent>();
             //todo: need to figure out how i can get a spell generator....
-            _actionRules = new ActionRulesEngine(this, null);
+            _rulesEngine = new ActionRulesEngine(this);
+            _characterStatus = new CharacterStatus(maxBaseHp, maxBaseMana, baseAttackStrengh, baseMagicPower);
         }
     
         void Update()
         {
-            _actionRules.run();
+            if (_characterStatus.isDead)
+            {
+                //should play the die animation...and do other stuffs.
+                //for now i will just disable the entire game object.
+                //todo:
+            }
+            _rulesEngine.run();
         }
     
         public void moveAgentToPlace(CharacterAction moveAction)
@@ -49,14 +62,14 @@ namespace Controllers
             );
             //the actual position of the target destination, and hence the destination itself can only be calculated when we actually
             //execute this move action.
-            moveAction.target = Instantiate(navDestinationPrefab, navDestinationTransform, Quaternion.identity);
+            moveAction.Target = Instantiate(navDestinationPrefab, navDestinationTransform, Quaternion.identity);
             _animator.SetInteger(AnimationStatus.AniStat, AnimationStatus.Run22);
         }
     
         public void moveAgentToTarget(CharacterAction moveToTargetAction)
         {
             _agent.isStopped = false;
-            _agent.destination = moveToTargetAction.target.transform.position;
+            _agent.destination = moveToTargetAction.Target.transform.position;
             _animator.SetInteger(AnimationStatus.AniStat, AnimationStatus.Run22);
         }
     
@@ -67,13 +80,19 @@ namespace Controllers
     
         public void onAttackBecomeEffective()
         {
-            //todo: 
+            CharacterAction action = _rulesEngine.getCurrentRunningAction();
+            action.CharacterControl.onReceiveSpell(action);
         }
     
         public void onAttackFinish()
         {
             _animator.SetInteger(AnimationStatus.AniStat, AnimationStatus.Ready56);
-            _actionRules.setWaitTime(0.5f);
+            _rulesEngine.setWaitTime(0.5f);
+        }
+
+        public void onReceiveSpell(CharacterAction action)
+        {
+            _characterStatus.onReceivingSpell(action.spell);
         }
     
         public void reachDestination()
@@ -90,12 +109,12 @@ namespace Controllers
     
         void OnTriggerEnter(Collider other)
         {
-            _actionRules.onTriggerEnter(other);
+            _rulesEngine.onTriggerEnter(other);
         }
     
         private void OnTriggerExit(Collider other)
         {
-            _actionRules.onTriggerExit(other);
+            _rulesEngine.onTriggerExit(other);
         }
     }    
 

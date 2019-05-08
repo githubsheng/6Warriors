@@ -1,6 +1,11 @@
 using UnityEngine;
 
-public class LevelController : MonoBehaviour
+namespace Controllers
 {
+
+    public class LevelController : MonoBehaviour
+    {
         
-} 
+    } 
+    
+}
