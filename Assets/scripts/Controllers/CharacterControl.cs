@@ -83,7 +83,12 @@ namespace Controllers
         public void onAttackBecomeEffective()
         {
             CharacterAction action = _rulesEngine.getCurrentRunningAction();
-            action.CharacterControl.onReceiveSpell(action);
+            if (action.IsTargetValid)
+            {
+                //target may not be valid (died) at this time
+                action.CharacterControl.onReceiveSpell(action);                
+            }
+
         }
     
         public void onAttackFinish()
@@ -130,6 +135,11 @@ namespace Controllers
             //for now i will just disable the entire game object.
             self.SetActive(false);
             //i should also inform the level controller to remove this object somehow.
+        }
+
+        public bool IsDead
+        {
+            get { return _characterStatus.isDead; }
         }
     }    
 
