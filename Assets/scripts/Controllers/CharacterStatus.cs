@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Buffs;
 using Spells;
 using UnityEngine;
 using Random = System.Random;
@@ -33,13 +34,14 @@ namespace Controllers
         public int magicResistence;
         public int fireResistence;
         public int iceResistence;
+        // 0 - 100
         public int dodgeChance;
+        // by default it is 100, if blind, set to something like 20
+        public int hitChance;
         
-        public bool isDisabled;
         public bool isDead;
-        public bool isPoisoned;
-        public bool isPetryfied;
-        public bool isBlind;
+        public int isPoisoned;
+        public int isBlind;
     
         private float _expectedNextEvaluationTime;
     
@@ -60,6 +62,7 @@ namespace Controllers
             baseHpRegerationPerSecond = 5;
             baseManaRegeratoinPerSecond = 10;
             _expectedNextEvaluationTime = 0;
+            hitChance = 100;
             //all base arm, (all kinds of) base magic resistance are 0 by default.
         }
     
@@ -96,6 +99,7 @@ namespace Controllers
             if (effect.buff != null)
             {
                 buffs.Add(effect.buff);
+                effect.buff.onAddingBuffer(this);
             }
             
             damage += calculateReceivedPhysicalDamage(effect);
@@ -117,10 +121,10 @@ namespace Controllers
             //todo:
         } 
     
-        public int[] reEvaluateStatusEverySecond()
+        public bool reEvaluateStatusEverySecond()
         {
             float now = Time.time;
-            if (now < _expectedNextEvaluationTime) return null;
+            if (now < _expectedNextEvaluationTime) return false;
     
             _expectedNextEvaluationTime += 1;
             
@@ -137,26 +141,15 @@ namespace Controllers
                 if (characterBuff.isExpired())
                 {
                     //this buff has expired, we need to revert all the effects of this buff
-                    maxHp -= characterBuff.maxHpChange;
-                    maxMana -= characterBuff.maxManaChange;
-                    armor -= characterBuff.armorChange;
-                    magicResistence -= characterBuff.magicResistenceChange;
-                    fireResistence -= characterBuff.fireResistenceChange;
-                    iceResistence -= characterBuff.iceResistenceChange;
-                    attackStrengh -= characterBuff.attackStrenghChange;
-                    magicPower -= characterBuff.magicPowerChange;
-                    dodgeChance -= characterBuff.dodgeChanceChange;
+                    characterBuff.onRemovingBuffer(this);
                 }
                 else
                 {
                     if (characterBuff.isEffective())
                     {
-                        hpIncrease += characterBuff.hpIncrease;
-                        manaIncrease += characterBuff.manaIncrease;
-                        dotDamage += characterBuff.hpDecrease;
-                        manaBurned += characterBuff.manaDecrease;
-                        characterBuff.updateNextEffectiveTime();
+                        characterBuff.onBufferBecomeEffective(this);
                     }
+                    
                     validBuffs.Add(characterBuff);
                 }
             }
@@ -174,10 +167,9 @@ namespace Controllers
             
             if (hp == 0)
             {
-                isDisabled = true;
                 resetStatus();
             }
-            return new[]{hpIncrease, manaIncrease, dotDamage, manaBurned};
+            return true;
         }
         
     }    

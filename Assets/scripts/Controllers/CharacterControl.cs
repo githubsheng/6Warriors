@@ -1,4 +1,5 @@
-﻿using Actions;
+﻿using System;
+using Actions;
 using Animations;
 using Spells;
 using UnityEngine;
@@ -36,15 +37,19 @@ namespace Controllers
     
         void Update()
         {
+            _characterStatus.reEvaluateStatusEverySecond();
+            
             if (_characterStatus.isDead)
             {
                 //should play the die animation...and do other stuffs.
                 //for now i will just disable the entire game object.
-                //todo:
+                _self.SetActive(false);
+                return;
             }
+            
             _rulesEngine.run();
         }
-    
+        
         public void moveAgentToPlace(CharacterAction moveAction)
         {
             _agent.isStopped = false;
