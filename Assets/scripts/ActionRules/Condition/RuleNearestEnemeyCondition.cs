@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using PlayerActionRules;
+using ActionRules;
 using UnityEngine;
 
 namespace Conditions

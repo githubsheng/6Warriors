@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
+using Spells;
 using UnityEngine;
 
-namespace PlayerActionRules
+namespace ActionRules
 {
     public class Rule
     {
         public Condition condition;
-        public string spellName;
+        public Spell spell;
         public bool enabled;
     }
 

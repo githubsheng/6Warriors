@@ -4,21 +4,21 @@ using UnityEngine;
 
 public class AnimationEventsHandler: MonoBehaviour
 {
-    private PlayerController playerController;
+    private CharacterController _characterController;
     
     void Start()
     {
-        playerController = GetComponentInParent<PlayerController>();
+        _characterController = GetComponentInParent<CharacterController>();
     }
 
     public void Attack51EffectiveCallback()
     {
-        playerController.onAttackBecomeEffective();
+        _characterController.onAttackBecomeEffective();
     }
     
     public void Attach51FinishCallback()
     {
-        playerController.onAttackFinish();
+        _characterController.onAttackFinish();
     }
 
     public void Attach2FinishCallback()
