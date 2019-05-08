@@ -1,28 +1,34 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Controllers;
 using UnityEngine;
 
-public class AnimationEventsHandler: MonoBehaviour
+namespace Animations
 {
-    private CharacterController _characterController;
+
+    public class AnimationEventsHandler: MonoBehaviour
+    {
+        private CharacterControl _characterControl;
     
-    void Start()
-    {
-        _characterController = GetComponentInParent<CharacterController>();
-    }
+        void Start()
+        {
+            _characterControl = GetComponentInParent<CharacterControl>();
+        }
 
-    public void Attack51EffectiveCallback()
-    {
-        _characterController.onAttackBecomeEffective();
-    }
+        public void Attack51EffectiveCallback()
+        {
+            _characterControl.onAttackBecomeEffective();
+        }
     
-    public void Attach51FinishCallback()
-    {
-        _characterController.onAttackFinish();
-    }
+        public void Attach51FinishCallback()
+        {
+            _characterControl.onAttackFinish();
+        }
 
-    public void Attach2FinishCallback()
-    {
+        public void Attach2FinishCallback()
+        {
 
-    }
+        }
+    }    
+
 }

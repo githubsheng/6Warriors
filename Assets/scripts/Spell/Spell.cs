@@ -10,7 +10,7 @@ namespace Spells
         public int hpHeal;
         public int manaHeal;
         public string name;
-        public PlayerBuff buff;
+        public CharacterBuff buff;
         public float spellEffectiveRange;
         public List<int> animationStatusList;
         private int animationStatusIndex = 0;
