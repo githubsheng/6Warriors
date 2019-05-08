@@ -1,7 +1,6 @@
 ﻿using System;
 using Actions;
 using Animations;
-using Spells;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -9,7 +8,7 @@ namespace Controllers
 {
     public class CharacterControl : MonoBehaviour
     {
-        public GameObject _self;
+        public GameObject self;
         public GameObject navDestinationPrefab;
     
         private NavMeshAgent _agent;
@@ -28,7 +27,7 @@ namespace Controllers
     
         void Start()
         {
-            _animator = _self.GetComponent<Animator>();
+            _animator = self.GetComponent<Animator>();
             _agent = GetComponent<NavMeshAgent>();
             //todo: need to figure out how i can get a spell generator....
             _rulesEngine = new ActionRulesEngine(this);
@@ -41,9 +40,7 @@ namespace Controllers
             
             if (_characterStatus.isDead)
             {
-                //should play the die animation...and do other stuffs.
-                //for now i will just disable the entire game object.
-                _self.SetActive(false);
+                onGameObjectKilled();
                 return;
             }
             
@@ -98,6 +95,11 @@ namespace Controllers
         public void onReceiveSpell(CharacterAction action)
         {
             _characterStatus.onReceivingSpell(action.spell);
+            
+            if (_characterStatus.isDead)
+            {
+                onGameObjectKilled();
+            }
         }
     
         public void reachDestination()
@@ -120,6 +122,14 @@ namespace Controllers
         private void OnTriggerExit(Collider other)
         {
             _rulesEngine.onTriggerExit(other);
+        }
+
+        private void onGameObjectKilled()
+        {
+            //should play the die animation...and do other stuffs.
+            //for now i will just disable the entire game object.
+            self.SetActive(false);
+            //i should also inform the level controller to remove this object somehow.
         }
     }    
 
