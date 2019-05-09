@@ -107,6 +107,11 @@ namespace Actions
                 return _characterControl;
             }
         }
+
+        public bool IsTargetValid
+        {
+            get { return _characterControl.IsDead; }
+        }
     }    
 }
 

@@ -1,11 +1,12 @@
 //also includes debuff
 
 using System;
+using Controllers;
 using UnityEngine;
 
-namespace Spells
+namespace Buffs
 {
-    public class CharacterBuff
+    public abstract class CharacterBuff
     {
         //these are one time effects, ie, only applied once
         public int maxHpChange;
@@ -31,11 +32,13 @@ namespace Spells
         public bool isDebuff;
         public string explaination;
     
-    
         public int intervalInSeconds;
         public float durationInSeconds;
         public float buffExpireTime;
         public float nextEffectiveTime;
+
+        public int makeBlind;
+        public int makePerified;
 
         public CharacterBuff(string name, string buffIconName, bool isDebuff, string explaination, float durationInSeconds)
         {
@@ -60,6 +63,12 @@ namespace Spells
         {
             nextEffectiveTime += intervalInSeconds;
         }
+
+        public abstract void onAddingBuffer(CharacterStatus status);
+
+        public abstract void onRemovingBuffer(CharacterStatus status);
+
+        public abstract void onBufferBecomeEffective(CharacterStatus status);
 
     }
 }

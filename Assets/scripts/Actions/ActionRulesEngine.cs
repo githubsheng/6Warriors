@@ -221,6 +221,9 @@ namespace Actions
                 case "move_to_moving_target":
                     examineMoveToMovingTargetAction();
                     break;
+                case "spell_action":
+                    examineIfTargetIsStillValid();
+                    break;
                 default:
                     break;
             }
@@ -250,6 +253,17 @@ namespace Actions
                 _characterControl.reachDestination();
                 _actionInExecution = null;
                 setWaitTime(0.2f);
+            }
+        }
+
+        private void examineIfTargetIsStillValid()
+        {
+            if (_actionInExecution.CharacterControl.IsDead)
+            {
+                //todo: if current action is a quick melee attack, or anything quick (like shooting an arrow) leave it to finish.
+                
+                //todo: if the character is still casting the spell (which typically take 2 seconds), then immediately cancel the cast animation.
+                
             }
         }
         
