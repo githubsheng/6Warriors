@@ -10,31 +10,30 @@ namespace Controllers
     {
         public GameObject self;
         public GameObject navDestinationPrefab;
-    
-        private NavMeshAgent _agent;
-        private Animator _animator;
+
+        protected NavMeshAgent _agent;
+        protected Animator _animator;
     
         private const float NavDestColliderTransHeight = 1.5f;
-        private ActionRulesEngine _rulesEngine;
+        protected ActionRulesEngine _rulesEngine;
 
-        private CharacterStatus _characterStatus;
+        protected CharacterStatus _characterStatus;
         
         //following are used to instantiate the characters status
         public int maxBaseHp;
         public int maxBaseMana;
         public int baseAttackStrengh;
         public int baseMagicPower;
-    
-        void Start()
+
+        public virtual void Start()
         {
             _animator = self.GetComponent<Animator>();
             _agent = GetComponent<NavMeshAgent>();
-            //todo: need to figure out how i can get a spell generator....
             _rulesEngine = new ActionRulesEngine(this);
             _characterStatus = new CharacterStatus(maxBaseHp, maxBaseMana, baseAttackStrengh, baseMagicPower);
         }
     
-        void Update()
+        public virtual void Update()
         {
             _characterStatus.reEvaluateStatusEverySecond();
             
@@ -88,6 +87,9 @@ namespace Controllers
                 //target may not be valid (died) at this time
                 action.CharacterControl.onReceiveSpell(action);                
             }
+            
+            //todo: rules engine should have a method that force an action to end, no matter if the action is interruptible.
+            //todo: this may apply 
 
         }
     
