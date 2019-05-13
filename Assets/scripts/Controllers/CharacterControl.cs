@@ -1,6 +1,7 @@
 ﻿using System;
 using Actions;
 using Animations;
+using Animations.warriors;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -64,19 +65,19 @@ namespace Controllers
             //the actual position of the target destination, and hence the destination itself can only be calculated when we actually
             //execute this move action.
             moveAction.Target = Instantiate(navDestinationPrefab, navDestinationTransform, Quaternion.identity);
-            _animator.SetInteger(AnimationStatus.AniStat, AnimationStatus.Run22);
+            _animator.SetInteger(RogueAnimationStatus.AniStat, RogueAnimationStatus.Run22);
         }
     
         public void moveAgentToTarget(CharacterAction moveToTargetAction)
         {
             _agent.isStopped = false;
             _agent.destination = moveToTargetAction.Target.transform.position;
-            _animator.SetInteger(AnimationStatus.AniStat, AnimationStatus.Run22);
+            _animator.SetInteger(RogueAnimationStatus.AniStat, RogueAnimationStatus.Run22);
         }
     
         public void startSpell(CharacterAction characterAction)
         {
-            _animator.SetInteger(AnimationStatus.AniStat, characterAction.spell.getAnimationStatus());
+            _animator.SetInteger(RogueAnimationStatus.AniStat, characterAction.spell.getAnimationStatus());
         }
     
         public void onAttackBecomeEffective()
@@ -95,7 +96,7 @@ namespace Controllers
     
         public void onAttackFinish()
         {
-            _animator.SetInteger(AnimationStatus.AniStat, AnimationStatus.Ready56);
+            _animator.SetInteger(RogueAnimationStatus.AniStat, RogueAnimationStatus.Ready56);
             _rulesEngine.setWaitTime(0.5f);
         }
 
@@ -112,13 +113,13 @@ namespace Controllers
         public void reachDestination()
         {
             _agent.isStopped = true;
-            _animator.SetInteger(AnimationStatus.AniStat, AnimationStatus.Ready56);
+            _animator.SetInteger(RogueAnimationStatus.AniStat, RogueAnimationStatus.Ready56);
         }
     
         public void reachTarget()
         {
             _agent.isStopped = true;
-            _animator.SetInteger(AnimationStatus.AniStat, AnimationStatus.Ready56);
+            _animator.SetInteger(RogueAnimationStatus.AniStat, RogueAnimationStatus.Ready56);
         }
     
         void OnTriggerEnter(Collider other)

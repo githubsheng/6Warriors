@@ -1,7 +1,7 @@
 using Controllers;
 using UnityEngine;
 
-namespace Buffs.rogue
+namespace Buffs.warriors.rogue
 {
     public class Poison : CharacterBuff
     {

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using Animations;
+using Animations.boss;
+using Animations.warriors;
 
 namespace Spells.boss
 {
@@ -15,7 +17,7 @@ namespace Spells.boss
         private static Spell createNormalAttackSpell()
         {
             //todo: here we need to refactor the animation status so that each kind of role has their own animation status.
-            return new Spell("melee_attack", 0, AnimationStatus.Attack51)
+            return new Spell("melee_attack", 0, BossAnimationStatus.Attack51)
             {
                 physicalAttackStrengh = 10
             };

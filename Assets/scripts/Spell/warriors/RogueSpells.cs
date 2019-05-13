@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Animations;
+using Animations.warriors;
 
 namespace Spells.warriors
 {
@@ -14,7 +15,7 @@ namespace Spells.warriors
 
         private static Spell createNormalAttackSpell()
         {
-            return new Spell("melee_attack", 0, AnimationStatus.Attack51)
+            return new Spell("melee_attack", 0, RogueAnimationStatus.Attack51)
             {
                 physicalAttackStrengh = 10
             };
