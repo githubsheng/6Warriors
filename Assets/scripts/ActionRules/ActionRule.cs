@@ -17,23 +17,23 @@ namespace ActionRules
 
         protected GameObject evaluatedTarget;
         
-        public bool isAnyEnemy()
+        virtual public bool isAnyEnemy()
         {
             return false;
         }
 
-        public bool isAnyTeammate()
+        virtual public bool isAnyTeammate()
         {
             return false;
         }
 
-        public bool isSelf()
+        virtual public bool isSelf()
         {
             return false;
         }
        
 
-        public bool evaluate(List<GameObject> targets, GameObject target, GameObject self)
+        virtual public bool evaluate(List<GameObject> targets, GameObject target, GameObject self)
         {
             return false;
         }
