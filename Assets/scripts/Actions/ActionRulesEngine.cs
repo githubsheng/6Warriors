@@ -123,63 +123,82 @@ namespace Actions
     
         private CharacterAction evaluateRuleAction()
         {        
-            GameObject actionTarget = _none;
             Rule targetRule = null;
             for (int i = 0; i < rules.Count; i++)
             {
                 Rule rule = rules[i];
                 Condition condition = rule.condition;
+                //tries to evaluate each rule and see if it is met.
                 if (condition.evaluate(null, _defaultEnemyTarget, _self))
                 {
-                    actionTarget = condition.getEvaluatedTarget();
-                    if (condition.isAnyEnemy() && _defaultEnemyTarget == _none)
-                    {
-                        _defaultEnemyTarget = actionTarget;
-                    }
-    
                     targetRule = rule;
                     break;
                 }
             }
             
+            //if none of the rules matches, return null, indicating that no rules match
             if (targetRule == null) return null;
-    
-            CharacterAction spellAction = CharacterAction.createSpellAction(actionTarget, targetRule.spell);
             
+            //some rule matches, go on.
+
             
-            //either target is an enemy or a teammate.
-            /*
-             * almost all actions requires the target to be within action range. depending on the action types, some needs to be in close range
-             * (in contact), some needs to be within a certain distance (for example, range attack)
-             */
-            bool needToMoveToTarget = isActionInRange(spellAction);
-    
-            if (needToMoveToTarget)
+            //if the rule is about the caster himself, return the action, no need to first reach out for the target.
+            if (targetRule.condition.isSelf())
             {
-                CharacterAction moveToTarget = CharacterAction.createPlayerMoveToMovingTargetAction(spellAction.Target);
-                moveToTarget.subsequentAction = spellAction;
-                return moveToTarget;
-            }
-            else
-            {
+                CharacterAction spellAction = CharacterAction.createSpellAction(_self, targetRule.spell);
                 return spellAction;
+            } else if (targetRule.condition.isNoTarget())
+            {
+                //todo: need to cater the cases in which the spell does not have a specific target, such as aoe attack.
+                return null;
+            } else
+            {
+                //target is either enemy or ally
+
+                //if it is about an enemy, we may set this enemy to a default enemy, if there is no default enemy now.
+                Condition condition = targetRule.condition;
+                GameObject actionTarget = condition.getEvaluatedTarget();
+                if (condition.isAnyEnemy() && _defaultEnemyTarget == _none)
+                {
+                    _defaultEnemyTarget = actionTarget;
+                }
+
+                //the rule's target is an enemy or an ally, we may potentially need to get closer to the target.
+                CharacterAction spellAction = CharacterAction.createSpellAction(actionTarget, targetRule.spell);
+
+                /*
+                 * almost all actions requires the target to be within action range. depending on the action types, some needs to be in close range
+                 * (in contact), some needs to be within a certain distance (for example, range attack)
+                 */
+                if (isActionTargetInRange(spellAction))
+                {
+                    CharacterAction moveToTarget =
+                        CharacterAction.createPlayerMoveToMovingTargetAction(spellAction.Target);
+                    moveToTarget.subsequentAction = spellAction;
+                    return moveToTarget;
+                }
+                else
+                {
+                    return spellAction;
+                }
+
             }
-            
         }
     
-        private bool isActionInRange(CharacterAction action)
+        private bool isActionTargetInRange(CharacterAction action)
         {
+            if (!action.Target)
+            {
+                throw new ArgumentException("needs to have a target to measure");
+            }
             Spell spell = action.spell;
             // <1f rather then == 0f to avoid the annoying ide complain
             if (spell.spellEffectiveRange < 1f)
             {
                 //needs to be right next to target.
                 return isInContact(action.Target);
-            }
-            else
-            {
-                return Vector3.Distance(_self.transform.position, action.Target.transform.position) < spell.spellEffectiveRange;
-            }
+            } 
+            return Vector3.Distance(_self.transform.position, action.Target.transform.position) < spell.spellEffectiveRange;
         }
     
         public void setWaitTime(float timeInSeconds)
@@ -234,7 +253,7 @@ namespace Actions
             CharacterAction moveToTarget = _actionInExecution;
             if (moveToTarget.subsequentAction == null) return;
             //it means we are moving to the target to execute the _pendingAction.
-            if (isActionInRange(moveToTarget.subsequentAction))
+            if (isActionTargetInRange(moveToTarget.subsequentAction))
             {
                 _characterControl.reachTarget();
                 _actionInExecution = null;
@@ -258,7 +277,7 @@ namespace Actions
 
         private void examineIfTargetIsStillValid()
         {
-            if (_actionInExecution.CharacterControl.IsDead)
+            if (_actionInExecution.TargetCharacterControl.IsDead)
             {
                 //todo: if current action is a quick melee attack, or anything quick (like shooting an arrow) leave it to finish.
                 
