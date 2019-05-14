@@ -31,7 +31,16 @@ namespace Controllers
                 spell = BossSpells.normalAttack
             };
             
-            rules.Add(attackNearestEnemy);
+            //todo: for the test im disabling it (for now)
+//            rules.Add(attackNearestEnemy);
+
+            Rule summonFirstWaveWhenHpBelow80Pecentage = new Rule
+            {
+                condition = new HpBelow80PercentageCondition(),
+                enabled = true,
+                //todo: spawn something rather than just normal attack
+                spell = BossSpells.normalAttack
+            };
             
             //hint: perhaps some rules to attack the warrior that casted "taunt"
 
