@@ -86,7 +86,7 @@ namespace Controllers
             if (action.IsTargetValid)
             {
                 //target may not be valid (died) at this time
-                action.CharacterControl.onReceiveSpell(action);                
+                action.TargetCharacterControl.onReceiveSpell(action);                
             }
             
             //todo: rules engine should have a method that force an action to end, no matter if the action is interruptible.
@@ -140,10 +140,13 @@ namespace Controllers
             //i should also inform the level controller to remove this object somehow.
         }
 
+        //should not be needed if we have getter for character status
         public bool IsDead
         {
             get { return _characterStatus.isDead; }
         }
+
+        public CharacterStatus CharacterStatus => _characterStatus;
     }    
 
 }

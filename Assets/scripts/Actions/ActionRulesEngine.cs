@@ -143,18 +143,17 @@ namespace Actions
 
             
             //if the rule is about the caster himself, return the action, no need to first reach out for the target.
-            if (targetRule.condition.isSelf())
+            if (targetRule.condition.EvaluatedTarget == _self)
             {
-                CharacterAction spellAction = CharacterAction.createSpellAction(_self, targetRule.spell);
-                return spellAction;
+                return CharacterAction.createSpellAction(_self, targetRule.spell);
             } else
             {
                 //target is either enemy or ally
 
                 //if it is about an enemy, we may set this enemy to a default enemy, if there is no default enemy now.
                 Condition condition = targetRule.condition;
-                GameObject actionTarget = condition.getEvaluatedTarget();
-                if (condition.isAnyEnemy() && _defaultEnemyTarget == _none)
+                GameObject actionTarget = condition.EvaluatedTarget;
+                if (isHostile(condition.EvaluatedTarget, _self) && _defaultEnemyTarget == _none)
                 {
                     _defaultEnemyTarget = actionTarget;
                 }
@@ -179,6 +178,11 @@ namespace Actions
                 }
 
             }
+        }
+
+        private bool isHostile(GameObject obj1, GameObject obj2)
+        {
+            return !obj1.CompareTag(obj2.tag);
         }
     
         private bool isActionTargetInRange(CharacterAction action)

@@ -9,19 +9,14 @@ namespace Conditions
     {
         //todo: this value needs to be experimented and tuned later.
         private const float MaxAutoAttackRange = 1000;
-        
-        public override bool isAnyEnemy()
-        {
-            return true;
-        }
 
-        public override bool evaluate(List<GameObject> targets, GameObject currentTarget, GameObject self)
+        public override bool evaluate(List<GameObject> targets, GameObject defaultTarget, GameObject self)
         {
             Vector3 selfPosition = self.transform.position;
 
-            if (Vector3.Distance(currentTarget.transform.position, selfPosition) < MaxAutoAttackRange)
+            if (Vector3.Distance(defaultTarget.transform.position, selfPosition) < MaxAutoAttackRange)
             {
-                evaluatedTarget = currentTarget;
+                EvaluatedTarget = defaultTarget;
                 return true;
             }
             
@@ -43,7 +38,7 @@ namespace Conditions
 
             if (nearest == null) return false;
 
-            evaluatedTarget = nearest;
+            EvaluatedTarget = nearest;
 
             return true;
         }

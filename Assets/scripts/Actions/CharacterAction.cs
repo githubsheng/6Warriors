@@ -17,7 +17,7 @@ namespace Actions
         
         //following props are for attacking / casting spells
         private GameObject _target;
-        private CharacterControl _characterControl;
+        private CharacterControl _targetCharacterControl;
         public Spell spell;
     
         public float expireTime;
@@ -96,21 +96,22 @@ namespace Actions
             set
             {
                 _target = value;
-                _characterControl = _target.GetComponent<CharacterControl>();
+                _targetCharacterControl = _target.GetComponent<CharacterControl>();
             }
         }
         
-        public CharacterControl CharacterControl
+        public CharacterControl TargetCharacterControl
         {
             get
             {
-                return _characterControl;
+                return _targetCharacterControl;
             }
         }
 
         public bool IsTargetValid
         {
-            get { return _characterControl.IsDead; }
+            //target is dead, or the spell has no specific target in the first place (like group heal or blizzard)
+            get { return _target && _targetCharacterControl.IsDead; }
         }
     }    
 }
