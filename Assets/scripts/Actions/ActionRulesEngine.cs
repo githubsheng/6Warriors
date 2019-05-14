@@ -147,10 +147,6 @@ namespace Actions
             {
                 CharacterAction spellAction = CharacterAction.createSpellAction(_self, targetRule.spell);
                 return spellAction;
-            } else if (targetRule.condition.isNoTarget())
-            {
-                //todo: need to cater the cases in which the spell does not have a specific target, such as aoe attack.
-                return null;
             } else
             {
                 //target is either enemy or ally
