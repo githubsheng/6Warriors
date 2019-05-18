@@ -23,19 +23,19 @@ namespace Actions
         
         private List<Rule> rules;
     
-        private void init(CharacterControl characterControl)
+        private void init(CharacterControl characterControl, LevelController levelController)
         {
             _inContacts = new HashSet<GameObject>();
             _defaultHostileTarget = null;
             _characterControl = characterControl;
             _self = characterControl.gameObject;
-            _levelController = GameObject.Find("level_ctrl").GetComponent<LevelController>();
+            _levelController = levelController;
         }
         
         //used by player characters. player can have 10 customizable rules.
-        public ActionRulesEngine(CharacterControl characterControl)
+        public ActionRulesEngine(CharacterControl characterControl, LevelController levelController)
         {
-            init(characterControl);
+            init(characterControl, levelController);
             rules = new List<Rule>();
             for (int i = 0; i < 10; i++)
             {
@@ -50,9 +50,9 @@ namespace Actions
         }
     
         //fixed rules are usually used for npc or mobs
-        public ActionRulesEngine(CharacterControl characterControl, List<Rule> fixedRules)
+        public ActionRulesEngine(CharacterControl characterControl, LevelController levelController, List<Rule> fixedRules)
         {
-            init(characterControl);
+            init(characterControl, levelController);
             rules = fixedRules;
         }
     

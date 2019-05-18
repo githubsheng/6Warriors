@@ -16,7 +16,8 @@ namespace Controllers
         protected Animator _animator;
     
         private const float NavDestColliderTransHeight = 1.5f;
-        protected ActionRulesEngine _rulesEngine;
+        protected ActionRulesEngine rulesEngine;
+        protected LevelController levelController;
 
         protected CharacterStatus _characterStatus;
         
@@ -30,8 +31,9 @@ namespace Controllers
         {
             _animator = self.GetComponentInChildren<Animator>();
             _agent = GetComponent<NavMeshAgent>();
-            _rulesEngine = new ActionRulesEngine(this);
             _characterStatus = new CharacterStatus(maxBaseHp, maxBaseMana, baseAttackStrengh, baseMagicPower);
+            levelController = GameObject.Find("level_ctrl").GetComponent<LevelController>();
+            rulesEngine = new ActionRulesEngine(this, levelController);
         }
     
         public virtual void Update()
@@ -44,7 +46,7 @@ namespace Controllers
                 return;
             }
             
-            _rulesEngine.run();
+            rulesEngine.run();
         }
         
         public void moveAgentToPlace(CharacterAction moveAction)
@@ -82,12 +84,12 @@ namespace Controllers
     
         public void onAttackBecomeEffective()
         {
-//            CharacterAction action = _rulesEngine.getCurrentRunningAction();
-//            if (action.IsTargetValid)
-//            {
-//                //target may not be valid (died) at this time
-//                action.TargetCharacterControl.onReceiveSpell(action);                
-//            }
+            CharacterAction action = rulesEngine.getCurrentRunningAction();
+            if (action.IsTargetValid)
+            {
+                //target may not be valid (died) at this time
+                action.TargetCharacterControl.onReceiveSpell(action);                
+            }
             
             //todo: rules engine should have a method that force an action to end, no matter if the action is interruptible.
             //todo: this may apply 
@@ -97,15 +99,18 @@ namespace Controllers
         public void onAttackFinish()
         {
             _animator.SetInteger(RogueAnimationStatus.AniStat, RogueAnimationStatus.Ready56);
-            _rulesEngine.setWaitTime(0.5f);
+            rulesEngine.setWaitTime(0.5f);
         }
 
         public void onReceiveSpell(CharacterAction action)
         {
+            Debug.Log("Receiving spell...");
             _characterStatus.onReceivingSpell(action.spell);
+            Debug.Log("Current HP is " + _characterStatus.hp);
             
             if (_characterStatus.isDead)
             {
+                Debug.Log("character is dead");
                 onGameObjectKilled();
             }
         }
@@ -124,12 +129,12 @@ namespace Controllers
     
         void OnTriggerEnter(Collider other)
         {
-            _rulesEngine.onTriggerEnter(other);
+            rulesEngine.onTriggerEnter(other);
         }
     
         private void OnTriggerExit(Collider other)
         {
-            _rulesEngine.onTriggerExit(other);
+            rulesEngine.onTriggerExit(other);
         }
 
         private void onGameObjectKilled()
@@ -138,6 +143,10 @@ namespace Controllers
             //for now i will just disable the entire game object.
             self.SetActive(false);
             //i should also inform the level controller to remove this object somehow.
+            
+            //inform the level control 
+            levelController.onCharacterKilled(self);
+            Destroy(self);
         }
 
         //should not be needed if we have getter for character status

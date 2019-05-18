@@ -111,7 +111,7 @@ namespace Actions
         public bool IsTargetValid
         {
             //target is dead, or the spell has no specific target in the first place (like group heal or blizzard)
-            get { return _target && _targetCharacterControl.IsDead; }
+            get { return _target && !_targetCharacterControl.IsDead; }
         }
     }    
 }

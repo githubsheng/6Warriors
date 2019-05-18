@@ -15,7 +15,8 @@ namespace Controllers
         {
             _animator = self.GetComponent<Animator>();
             _agent = GetComponent<NavMeshAgent>();
-            _rulesEngine = new ActionRulesEngine(this, initBossActionRules());
+            levelController = GameObject.Find("level_ctrl").GetComponent<LevelController>();
+            rulesEngine = new ActionRulesEngine(this, levelController, initBossActionRules());
             _characterStatus = new CharacterStatus(maxBaseHp, maxBaseMana, baseAttackStrengh, baseMagicPower);
         }
 
@@ -49,7 +50,7 @@ namespace Controllers
         
         public override void Update()
         {
-            Debug.Log("yo...");
+//            Debug.Log("yo...");
         }
 
 

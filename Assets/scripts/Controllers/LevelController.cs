@@ -79,6 +79,25 @@ namespace Controllers
             if (reference.CompareTag("warriors")) return _warriors;
             return _enemies;
         }
+
+        public void onCharacterKilled(GameObject character)
+        {
+            if (character.CompareTag("warriors"))
+            {
+                //may be revived...
+                //todo: 
+                Debug.Log("a warrior is dead, may be revived later");
+            } else if (character == _boss)
+            {
+                Debug.Log("You won....");
+                _enemies.Remove(_boss);
+            }
+            else
+            {
+                Debug.Log("a minion is killed");
+                _enemies.Remove(character);
+            }
+        }
         
         public void startFirstWave()
         {
