@@ -78,21 +78,22 @@ namespace Actions
             }
     
     
-            if (_actionInExecution != null  && _actionInExecution.actionName == "wait_action" && _actionInExecution.expireTime < Time.time)
+            if (ActionInExecution != null  && ActionInExecution.actionName == "wait_action" && ActionInExecution.expireTime < Time.time)
             {
                 //currently we have an wait action, and we have waited long enough. 
                 //remove the wait action, allowing next action to become actionInExecution.
-                _actionInExecution = null;
+                ActionInExecution = null;
             }
             
             CharacterAction nextAction = getNextAction();
             
             //check if we need to execute another action
-            if (_actionInExecution == null || (_actionInExecution.isInterrupbitle && nextAction.tryInterrupt))
+            if (ActionInExecution == null || (ActionInExecution.isInterrupbitle && nextAction.tryInterrupt))
             {
-                _actionInExecution = nextAction;
+                onEndingTheCurrentAction(ActionInExecution);
+                ActionInExecution = nextAction;
                 _pendingAction = null;
-                if (!_actionInExecution.isEvaluated)
+                if (!ActionInExecution.isEvaluated)
                 {
                     /*
                      * evaluated rule action can be null, indicating there is nothing to do. The GenericRuleAction is really a place holder
@@ -102,14 +103,22 @@ namespace Actions
                      *
                      * note that if the gamer manually specify an action, it can never be null, nor can a pending action be null.
                      */
-                    _actionInExecution = evaluateRuleAction();
-                    if (_actionInExecution == null) return;
+                    ActionInExecution = evaluateRuleAction();
+                    if (ActionInExecution == null) return;
                 }
                 executeAction();
             } 
             
             //if not, continue execute the current action
             continousExecuteAction();
+        }
+
+        private void onEndingTheCurrentAction(CharacterAction action)
+        {
+            if (action != null && action.actionName == "move")
+            {
+                Object.Destroy(action.Target);
+            }
         }
         
         private CharacterAction getNextAction()
@@ -207,12 +216,12 @@ namespace Actions
     
         public void setWaitTime(float timeInSeconds)
         {
-            _actionInExecution = CharacterAction.createWaitAction(timeInSeconds);
+            ActionInExecution = CharacterAction.createWaitAction(timeInSeconds);
         }
     
         private void executeAction()
         {
-            CharacterAction characterAction = _actionInExecution;
+            CharacterAction characterAction = ActionInExecution;
             switch (characterAction.actionName)
             {
                 case "move":
@@ -232,7 +241,7 @@ namespace Actions
     
         private void continousExecuteAction()
         {
-            switch (_actionInExecution.actionName)
+            switch (ActionInExecution.actionName)
             {
                 case "move":
                     examineMoveAction();
@@ -250,13 +259,13 @@ namespace Actions
         
         private void examineMoveToMovingTargetAction()
         {
-            CharacterAction moveToTarget = _actionInExecution;
+            CharacterAction moveToTarget = ActionInExecution;
             if (moveToTarget.subsequentAction == null) return;
             //it means we are moving to the target to execute the _pendingAction.
             if (isActionTargetInRange(moveToTarget.subsequentAction))
             {
                 _characterControl.reachTarget();
-                _actionInExecution = null;
+                ActionInExecution = null;
                 setWaitTime(0.2f);
                 if (_pendingAction != null) _pendingAction = moveToTarget.subsequentAction;
             }
@@ -264,13 +273,12 @@ namespace Actions
     
         private void examineMoveAction()
         {
-            CharacterAction moveAction = _actionInExecution;
+            CharacterAction moveAction = ActionInExecution;
             if (moveAction.Target == null) return;
             if (isInContact(moveAction.Target))
             {
-                Object.Destroy(moveAction.Target);
                 _characterControl.reachDestination();
-                _actionInExecution = null;
+                ActionInExecution = null;
                 setWaitTime(0.2f);
             }
         }
@@ -320,7 +328,20 @@ namespace Actions
 
         public CharacterAction getCurrentRunningAction()
         {
-            return _actionInExecution;
+            return ActionInExecution;
+        }
+
+        private CharacterAction ActionInExecution
+        {
+            get => _actionInExecution;
+            set
+            {
+                if (_actionInExecution != null && _actionInExecution.actionName == "move")
+                {
+                    Object.Destroy(_actionInExecution.Target);
+                }
+                _actionInExecution = value;
+            }
         }
     }    
 
