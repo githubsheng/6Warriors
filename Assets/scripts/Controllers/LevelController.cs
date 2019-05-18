@@ -32,9 +32,9 @@ namespace Controllers
         public static LevelController instance = null;
         
         //a list of warriors, it needs to be passed to the enemies' rule engine, for them to make the decisions (ie, who to attack)
-        List<GameObject> _warriors = new List<GameObject>();
+        public List<GameObject> _warriors = new List<GameObject>();
         //a list of the current living enemies in the level. these needs to be passed to warriors' rule engine.
-        List<GameObject> _enemies = new List<GameObject>();
+        public List<GameObject> _enemies = new List<GameObject>();
         
         //Awake is always called before any Start functions
         void Awake()
@@ -68,6 +68,18 @@ namespace Controllers
             //todo: init the in battle game ui.
         }
 
+        public List<GameObject> getHostiles(GameObject reference)
+        {
+            if (reference.CompareTag("warriors")) return _enemies;
+            return _warriors;
+        }
+
+        public List<GameObject> getFriendly(GameObject reference)
+        {
+            if (reference.CompareTag("warriors")) return _warriors;
+            return _enemies;
+        }
+        
         public void startFirstWave()
         {
             Debug.Log("start the first wave of mobs....");

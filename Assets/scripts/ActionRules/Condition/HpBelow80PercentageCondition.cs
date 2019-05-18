@@ -7,7 +7,7 @@ namespace Conditions
 {
     public class HpBelow80PercentageCondition : Condition
     {
-        public override bool evaluate(List<GameObject> targets, GameObject defaultTarget, GameObject self)
+        public override bool evaluate(List<GameObject> hostiles, List<GameObject> friendly, GameObject defaultTarget, GameObject self)
         {
             CharacterControl cc = self.GetComponent<CharacterControl>();
             EvaluatedTarget = self;

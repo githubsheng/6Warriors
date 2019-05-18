@@ -47,7 +47,7 @@ namespace ActionRules
         private GameObject _evaluatedTarget;
         private bool _isEvaluatedTargetSet = false;
        
-        virtual public bool evaluate(List<GameObject> targets, GameObject defaultTarget, GameObject self)
+        virtual public bool evaluate(List<GameObject> hostiles, List<GameObject> friendly, GameObject defaultTarget, GameObject self)
         {
             return false;
         }
@@ -56,7 +56,7 @@ namespace ActionRules
         {
             get
             {
-                if(_isEvaluatedTargetSet) throw new InvalidOperationException("evaluated target is not set, call evaluate first");
+                if(!_isEvaluatedTargetSet) throw new InvalidOperationException("evaluated target is not set, call evaluate first");
                 return _evaluatedTarget;
             }
             set

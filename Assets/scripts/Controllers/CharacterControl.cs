@@ -28,7 +28,7 @@ namespace Controllers
 
         public virtual void Start()
         {
-            _animator = self.GetComponent<Animator>();
+            _animator = self.GetComponentInChildren<Animator>();
             _agent = GetComponent<NavMeshAgent>();
             _rulesEngine = new ActionRulesEngine(this);
             _characterStatus = new CharacterStatus(maxBaseHp, maxBaseMana, baseAttackStrengh, baseMagicPower);
@@ -82,12 +82,12 @@ namespace Controllers
     
         public void onAttackBecomeEffective()
         {
-            CharacterAction action = _rulesEngine.getCurrentRunningAction();
-            if (action.IsTargetValid)
-            {
-                //target may not be valid (died) at this time
-                action.TargetCharacterControl.onReceiveSpell(action);                
-            }
+//            CharacterAction action = _rulesEngine.getCurrentRunningAction();
+//            if (action.IsTargetValid)
+//            {
+//                //target may not be valid (died) at this time
+//                action.TargetCharacterControl.onReceiveSpell(action);                
+//            }
             
             //todo: rules engine should have a method that force an action to end, no matter if the action is interruptible.
             //todo: this may apply 

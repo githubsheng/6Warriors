@@ -14,21 +14,22 @@ namespace Actions
     {
         private CharacterAction _pendingAction;
         private CharacterAction _actionInExecution;
-        private GameObject _defaultEnemyTarget;
-        private GameObject _none;
+        //a default target can not be a friendly target, this is mostly used when deciding what to attack, not what / who to heal.
+        private GameObject _defaultHostileTarget;
         private GameObject _self;
         private HashSet<GameObject> _inContacts;
         private CharacterControl _characterControl;
+        private LevelController _levelController;
         
         private List<Rule> rules;
     
         private void init(CharacterControl characterControl)
         {
             _inContacts = new HashSet<GameObject>();
-            _none = new GameObject();
-            _defaultEnemyTarget = _none;
+            _defaultHostileTarget = null;
             _characterControl = characterControl;
             _self = characterControl.gameObject;
+            _levelController = GameObject.Find("level_ctrl").GetComponent<LevelController>();
         }
         
         //used by player characters. player can have 10 customizable rules.
@@ -45,6 +46,7 @@ namespace Actions
             //todo: for testing purpose im gonna put a "attack nearest enemy rule for player"
             rules[0].condition = new RuleNearestEnemeyCondition();
             rules[0].spell = RogueSpells.normalAttack;
+            rules[0].enabled = true;
         }
     
         //fixed rules are usually used for npc or mobs
@@ -62,7 +64,7 @@ namespace Actions
                 RaycastHit hit;
                 if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 100))
                 {
-                    if (hit.collider.CompareTag("small_mob"))
+                    if (hit.collider.CompareTag("monsters") || hit.collider.CompareTag("warriors"))
                     {
                         //clicked on a mob
                         setCurrentTarget(hit.collider.gameObject);
@@ -124,12 +126,15 @@ namespace Actions
         private CharacterAction evaluateRuleAction()
         {        
             Rule targetRule = null;
+            List<GameObject> hostiles = _levelController.getHostiles(_self);
+            List<GameObject> friendly = _levelController.getFriendly(_self);
+            
             for (int i = 0; i < rules.Count; i++)
             {
                 Rule rule = rules[i];
                 Condition condition = rule.condition;
                 //tries to evaluate each rule and see if it is met.
-                if (condition.evaluate(null, _defaultEnemyTarget, _self))
+                if (rule.enabled && condition.evaluate(hostiles, friendly, _defaultHostileTarget, _self))
                 {
                     targetRule = rule;
                     break;
@@ -140,7 +145,6 @@ namespace Actions
             if (targetRule == null) return null;
             
             //some rule matches, go on.
-
             
             //if the rule is about the caster himself, return the action, no need to first reach out for the target.
             if (targetRule.condition.EvaluatedTarget == _self)
@@ -153,9 +157,9 @@ namespace Actions
                 //if it is about an enemy, we may set this enemy to a default enemy, if there is no default enemy now.
                 Condition condition = targetRule.condition;
                 GameObject actionTarget = condition.EvaluatedTarget;
-                if (isHostile(condition.EvaluatedTarget, _self) && _defaultEnemyTarget == _none)
+                if (isHostile(condition.EvaluatedTarget, _self) && !_defaultHostileTarget)
                 {
-                    _defaultEnemyTarget = actionTarget;
+                    _defaultHostileTarget = actionTarget;
                 }
 
                 //the rule's target is an enemy or an ally, we may potentially need to get closer to the target.
@@ -165,7 +169,7 @@ namespace Actions
                  * almost all actions requires the target to be within action range. depending on the action types, some needs to be in close range
                  * (in contact), some needs to be within a certain distance (for example, range attack)
                  */
-                if (isActionTargetInRange(spellAction))
+                if (!isActionTargetInRange(spellAction))
                 {
                     CharacterAction moveToTarget =
                         CharacterAction.createPlayerMoveToMovingTargetAction(spellAction.Target);
@@ -203,10 +207,6 @@ namespace Actions
     
         public void setWaitTime(float timeInSeconds)
         {
-            if (_actionInExecution.actionName == "move" || _actionInExecution.actionName == "move_to_moving_target")
-            {
-                throw new InvalidOperationException("running move and move to target action. they need to be properly terminated before we set _actionInExecution to something else");
-            }
             _actionInExecution = CharacterAction.createWaitAction(timeInSeconds);
         }
     
@@ -277,13 +277,13 @@ namespace Actions
 
         private void examineIfTargetIsStillValid()
         {
-            if (_actionInExecution.TargetCharacterControl.IsDead)
-            {
-                //todo: if current action is a quick melee attack, or anything quick (like shooting an arrow) leave it to finish.
-                
-                //todo: if the character is still casting the spell (which typically take 2 seconds), then immediately cancel the cast animation.
-                
-            }
+//            if (_actionInExecution.TargetCharacterControl.IsDead)
+//            {
+//                //todo: if current action is a quick melee attack, or anything quick (like shooting an arrow) leave it to finish.
+//                
+//                //todo: if the character is still casting the spell (which typically take 2 seconds), then immediately cancel the cast animation.
+//                
+//            }
         }
         
         private void setMoveAction(Vector3 userSpecifiedMoveDestination)
@@ -294,13 +294,13 @@ namespace Actions
         
         private void setCurrentTarget(GameObject target)
         {
-            _defaultEnemyTarget = target;
+            _defaultHostileTarget = target;
             
         }
     
         private void resetCurrentTarget()
         {
-            _defaultEnemyTarget = _none;
+            _defaultHostileTarget = null;
         }
     
         public void onTriggerEnter(Collider other)
