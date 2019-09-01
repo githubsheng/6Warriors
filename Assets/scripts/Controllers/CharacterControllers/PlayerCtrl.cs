@@ -11,7 +11,7 @@ namespace CharacterControllers {
         
         private int commonAnimationParam = Animator.StringToHash("animationStatus");
 
-        private int mouseDetectionMask = 1 << 10;
+        private int turnDetectionMask = 1 << 10;
         private Vector3 playerToMouse;
         private float freezeUntil;
         private int attackAnimationValUsed;
@@ -71,13 +71,10 @@ namespace CharacterControllers {
             if (Input.GetKey(KeyCode.Space) || isAttackKeyPressed()) {
                 Ray camRay = mainCamera.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hit;
-                if (Physics.Raycast(camRay, out hit, camRayLength, mouseDetectionMask)) {
+                if (Physics.Raycast(camRay, out hit, camRayLength, turnDetectionMask)) {
+                    Debug.Log("hit...");
                     //cache the moue pos to avoid extra ray casts
                     //assumes mouse click detection plane and arrowSpawnPos has same y axis value
-                    //todo: this should not be named mouse click detection plane, it is specifically for firing arrows...
-                    //todo: used as a movement plane, it is not very precious, but obviously it doesn't really matter.
-                    //todo: think about it.....
-                    //todo: add some more comments....
                     playerToMouse = hit.point - arrowSpawnPos.position;
                     playerToMouse.y = 0;
                     playerToMouse = Vector3.Normalize(playerToMouse);

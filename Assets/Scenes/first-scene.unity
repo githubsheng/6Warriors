@@ -3250,7 +3250,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 28
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -3275,13 +3275,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1175668827}
-  m_LocalRotation: {x: 0.40660587, y: -0, z: -0, w: 0.91360366}
-  m_LocalPosition: {x: 0, y: 11.64, z: -10.58}
+  m_LocalRotation: {x: 0.2854945, y: 0.3639536, z: -0.11825568, w: 0.8786617}
+  m_LocalPosition: {x: -18, y: 17.45, z: -18}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 47.984, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 36, y: 45, z: 0}
 --- !u!114 &1175668831
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3294,8 +3294,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17863f742f63e485e9a158b621200106, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  followYOffset: 14
-  followZOffset: -6.5
+  followXOffset: -18
+  followYOffset: 17.45
+  followZOffset: -18
   target: {fileID: 1191296975}
 --- !u!4 &1191296975 stripped
 Transform:
@@ -4607,14 +4608,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1935229337}
-  m_LocalRotation: {x: -0, y: -0.29093602, z: -0, w: 0.9567426}
-  m_LocalPosition: {x: 2.2658753, y: 0, z: -1.3091054}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 349283479}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: -33.828003, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1970857131
 GameObject:
   m_ObjectHideFlags: 0
@@ -5198,6 +5199,38 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 648350120, guid: 6a2e39934dd8e41d6bfa6f71169000cb, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 648350120, guid: 6a2e39934dd8e41d6bfa6f71169000cb, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 648350118, guid: 6a2e39934dd8e41d6bfa6f71169000cb, type: 3}
+      propertyPath: m_Size.x
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 648350118, guid: 6a2e39934dd8e41d6bfa6f71169000cb, type: 3}
+      propertyPath: m_Size.z
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 2141126460, guid: 6a2e39934dd8e41d6bfa6f71169000cb, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 648350117, guid: 6a2e39934dd8e41d6bfa6f71169000cb, type: 3}
+      propertyPath: m_Name
+      value: turn_detection_plane
+      objectReference: {fileID: 0}
+    - target: {fileID: 648350117, guid: 6a2e39934dd8e41d6bfa6f71169000cb, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
+      objectReference: {fileID: 0}
+    - target: {fileID: 1191296978, guid: 6a2e39934dd8e41d6bfa6f71169000cb, type: 3}
+      propertyPath: camRayLength
+      value: 100
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6a2e39934dd8e41d6bfa6f71169000cb, type: 3}
 --- !u!1001 &9132187621045296587
@@ -5211,6 +5244,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: skeleton
+      objectReference: {fileID: 0}
+    - target: {fileID: 9132187619919678659, guid: bcac770d21e0e4358a1c436b9b14a6b9,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9132187619919678658, guid: bcac770d21e0e4358a1c436b9b14a6b9,
         type: 3}
