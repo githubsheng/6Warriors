@@ -33,10 +33,8 @@ namespace Spells.ArrowAttack {
             }
         }
 
-        private void OnTriggerExit(Collider other) {
-            if (other.CompareTag("PlayerSpellBoundary")) {
-                Destroy(gameObject);
-            }
+        void OnBecameInvisible() {
+            Destroy(gameObject);
         }
     }
 }
