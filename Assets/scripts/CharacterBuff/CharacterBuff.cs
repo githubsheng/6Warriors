@@ -1,7 +1,7 @@
 //also includes debuff
 
 using System;
-using Controllers;
+using CharacterControllers;
 using UnityEngine;
 
 namespace Buffs
@@ -47,6 +47,12 @@ namespace Buffs
             this.isDebuff = isDebuff;
             this.explaination = explaination;
             this.durationInSeconds = durationInSeconds;
+            resetExpireTime();
+        }
+
+        public void resetExpireTime()
+        {
+            buffExpireTime = Time.time + durationInSeconds;
         }
 
         public bool isExpired()

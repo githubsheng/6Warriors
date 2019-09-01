@@ -656,7 +656,7 @@ ModelImporter:
       curves: []
       events:
       - time: 1
-        functionName: Attach2FinishCallback
+        functionName: onAttackFinish
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
@@ -858,15 +858,8 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.46853146
-        functionName: Attack51EffectiveCallback
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
       - time: 1
-        functionName: Attach51FinishCallback
+        functionName: onAttackFinish
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0

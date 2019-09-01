@@ -1,0 +1,110 @@
+using System;
+using Gui.HealthBar;
+using Spells;
+using UnityEngine;
+using UnityEngine.AI;
+using Vector3 = UnityEngine.Vector3;
+
+namespace CharacterControllers {
+    public class MinionCtrl : MonoBehaviour {
+        private GameObject player;
+        private PlayerCtrl playerCtrl;
+        private NavMeshAgent agent;
+        private Animator animator;
+        private CharacterStatus characterStatus;
+        private int commonAnimationParam = Animator.StringToHash("animationStatus");
+        private int attackAnimationIdxUsed;
+        private int[] attackAnimationVals;
+        private float freezeUntil;
+        private GameObject floatingHealthBar;
+        private FloatingHealthBar healthBarCtr;
+        
+        public int attackRange;
+        public int maxHeightDifferenceForEffectiveAttack;
+        
+        public int maxBaseHp;
+        public int maxBaseMana;
+        public int baseAttackStrength;
+        public int baseMagicPower;
+        
+        public int runAnimationVal;
+        //todo: if no input for a time, go back to idle mode
+        public int idleAnimationVal;
+        public int readyAnimationVal;
+        public int attack01AnimationVal;
+        public int attack02AnimationVal;
+        public int attack03AnimationVal;
+        public int dieAnimationVal;
+
+        public GameObject floatingHealthBarPrefab;
+        public float floatingHealthBarUpwardsOffset;
+
+        
+        private void Start() {
+            player = GameObject.FindWithTag("Player");
+            animator = gameObject.GetComponentInChildren<Animator>();
+            characterStatus = new CharacterStatus(maxBaseHp, maxBaseMana, baseAttackStrength, baseMagicPower);
+            agent =  GetComponent<NavMeshAgent>();
+            attackAnimationVals = new []{attack01AnimationVal, attack02AnimationVal, attack01AnimationVal, attack02AnimationVal, attack03AnimationVal};
+            floatingHealthBar = Instantiate(floatingHealthBarPrefab, transform);
+            healthBarCtr = floatingHealthBar.GetComponent<FloatingHealthBar>();
+            healthBarCtr.setHealthBarAttrib(floatingHealthBarUpwardsOffset);
+        }
+        
+        private void Update() {
+            characterStatus.reEvaluateStatusEverySecond();
+            healthBarCtr.setHealth((float)characterStatus.hp / characterStatus.maxHp);
+            if (characterStatus.isDead) {
+                onKilled();
+                return;
+            }
+            if (Time.time <= freezeUntil) return;
+            if (isPlayerInAttackRange()) {
+                attack();
+                return;
+            }
+            moveAgentToTarget(player.transform);
+        }
+
+        private bool isPlayerInAttackRange() {
+            Vector3 playerPos = player.transform.position;
+            Vector3 selfPos = gameObject.transform.position;
+            if (Math.Abs(playerPos.y - selfPos.y) > maxHeightDifferenceForEffectiveAttack) return false;
+            return Vector3.Distance(playerPos, selfPos) < attackRange;
+        }
+
+        private void attack() {
+            //pause movement first
+            agent.isStopped = true;
+            freezeUntil = float.MaxValue;
+            attackAnimationIdxUsed = (++attackAnimationIdxUsed) % attackAnimationVals.Length;
+            animator.SetInteger(commonAnimationParam, attackAnimationVals[attackAnimationIdxUsed]);
+            //todo: finish attack logic.
+        }
+        
+        public void onAttackFinish()
+        {
+            freezeUntil = Time.time;
+        }
+        
+        private void moveAgentToTarget(Transform target)
+        {
+            //agent may be paused previously by setting isStopped to true, eg. player is in magic attack range, and character paused
+            //to attack player. if after attack, player is out of range again, this character needs to chase player.
+            agent.isStopped = false;
+            agent.destination = target.position;
+            animator.SetInteger(commonAnimationParam, runAnimationVal);
+        }
+        
+        private void onKilled()
+        {
+            //todo: animation
+//            animator.SetInteger(commonAnimationParam, dieAnimationVal);
+            Destroy(gameObject);
+        }
+
+        public void receiveSpell(Spell spell) {
+            characterStatus.onReceivingSpell(spell);
+        }
+    }
+}

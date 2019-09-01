@@ -4,8 +4,11 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - player_nav_destination
-  - small_mob
+  - PlayerSpellBoundary
+  - Wall
+  - Enemy
+  - Floor
+  - MouseClickDetectionPlane
   layers:
   - Default
   - TransparentFX
@@ -17,7 +20,7 @@ TagManager:
   - 
   - PostProcessing
   - Characters
-  - 
+  - MouseClickDetection
   - 
   - 
   - 
