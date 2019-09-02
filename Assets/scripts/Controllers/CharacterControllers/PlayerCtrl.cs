@@ -3,6 +3,7 @@ using Spells.ArrowAttack;
 using UnityEngine;
 
 namespace CharacterControllers {
+    //todo: I need to get rid of the animation event and find an alternative
     public class PlayerCtrl : MonoBehaviour {
 
         private Animator animator;
