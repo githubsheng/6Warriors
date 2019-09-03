@@ -13,6 +13,7 @@ namespace CharacterControllers {
         private int commonAnimationParam = Animator.StringToHash("animationStatus");
 
         private int turnDetectionMask = 1 << 10;
+        private int arrowDirectionMask = 1 << 11;
         private Vector3 playerToMouse;
         private float freezeUntil;
         private int attackAnimationValUsed;
@@ -73,10 +74,8 @@ namespace CharacterControllers {
                 Ray camRay = mainCamera.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hit;
                 if (Physics.Raycast(camRay, out hit, camRayLength, turnDetectionMask)) {
-                    Debug.Log("hit...");
                     //cache the moue pos to avoid extra ray casts
-                    //assumes mouse click detection plane and arrowSpawnPos has same y axis value
-                    playerToMouse = hit.point - arrowSpawnPos.position;
+                    playerToMouse = hit.point - transform.position;
                     playerToMouse.y = 0;
                     playerToMouse = Vector3.Normalize(playerToMouse);
                     Quaternion newRotation = Quaternion.LookRotation(playerToMouse);
@@ -94,22 +93,31 @@ namespace CharacterControllers {
             }
         }
 
-        private void tryAttack() {
-            if (Time.time <= freezeUntil) return;
-            if (isAttackKeyPressed()) {
-                freezeUntil = float.MaxValue;
-                attackAnimationValUsed = attack01AnimationVal;
-                animator.SetInteger(commonAnimationParam, attack01AnimationVal);
-                
+        private void spawnArrow() {
+            Vector3 spawnPos = arrowSpawnPos.position;
+            Ray camRay = mainCamera.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            if (Physics.Raycast(camRay, out hit, camRayLength, arrowDirectionMask)) {
+                //cache the moue pos to avoid extra ray casts
+                Vector3 hitToSpawn = hit.point - spawnPos;
+                hitToSpawn = Vector3.Normalize(hitToSpawn);
+                GameObject darkArrow = Instantiate(darkArrowPrefab, spawnPos, Quaternion.LookRotation(hitToSpawn));
+                ArrowAttack arrowAttack = darkArrow.GetComponent<ArrowAttack>();
+                arrowAttack.setAttackAttrib(Spell.createPhysicalAttack(10), hitToSpawn);
             }
+            
         }
 
-        public void onAttackBecomeEffective() {
-            GameObject darkArrow = Instantiate(darkArrowPrefab, arrowSpawnPos.position, arrowSpawnPos.rotation);
-            ArrowAttack arrowAttack = darkArrow.GetComponent<ArrowAttack>();
-            Vector3 characterForward = gameObject.transform.forward;
-            arrowAttack.setAttackAttrib(Spell.createPhysicalAttack(10), characterForward);
+        private void tryAttack() {
+            if (Time.time <= freezeUntil) return;
+            if (!isAttackKeyPressed()) return;
+            freezeUntil = float.MaxValue;
+            attackAnimationValUsed = attack01AnimationVal;
+            animator.SetInteger(commonAnimationParam, attack01AnimationVal);
+            spawnArrow();
         }
+
+        
         
         public void onAttackFinish()
         {
@@ -120,15 +128,11 @@ namespace CharacterControllers {
                     : attack01AnimationVal;
                 tryTurn();
                 animator.SetInteger(commonAnimationParam, attackAnimationValUsed);
+                spawnArrow();
             }
             else {
                 freezeUntil = Time.time;
             }
-        }
-
-        private void attack(int attackAnimationVal) {
-            
-
         }
         
         private void onKilled()

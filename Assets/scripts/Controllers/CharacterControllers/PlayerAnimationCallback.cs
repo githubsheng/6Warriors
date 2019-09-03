@@ -15,9 +15,5 @@ namespace CharacterControllers {
         public void onAttackFinish() {
             playerCtrl.onAttackFinish();
         }
-
-        public void onAttackBecomeEffective() {
-            playerCtrl.onAttackBecomeEffective();
-        }
     }
 }
