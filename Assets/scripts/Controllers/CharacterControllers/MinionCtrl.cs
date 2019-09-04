@@ -18,6 +18,7 @@ namespace CharacterControllers {
         private float freezeUntil;
         private GameObject floatingHealthBar;
         private FloatingHealthBar healthBarCtr;
+        private bool isInBattleStatus;
         
         public int attackRange;
         public int maxHeightDifferenceForEffectiveAttack;
@@ -38,6 +39,7 @@ namespace CharacterControllers {
 
         public GameObject floatingHealthBarPrefab;
         public float floatingHealthBarUpwardsOffset;
+        public float alertRange;
 
         
         private void Start() {
@@ -52,25 +54,32 @@ namespace CharacterControllers {
         }
         
         private void Update() {
-            characterStatus.reEvaluateStatusEverySecond();
-            healthBarCtr.setHealth((float)characterStatus.hp / characterStatus.maxHp);
-            if (characterStatus.isDead) {
-                onKilled();
-                return;
+            if (isInBattleStatus) {
+                characterStatus.reEvaluateStatusEverySecond();
+                healthBarCtr.setHealth((float)characterStatus.hp / characterStatus.maxHp);
+                if (characterStatus.isDead) {
+                    onKilled();
+                    return;
+                }
+                if (Time.time <= freezeUntil) return;
+                if (isPlayerInRange(attackRange)) {
+                    attack();
+                    return;
+                }
+                moveAgentToTarget(player.transform);
             }
-            if (Time.time <= freezeUntil) return;
-            if (isPlayerInAttackRange()) {
-                attack();
-                return;
+            else if (isPlayerInRange(alertRange)) {
+                isInBattleStatus = true;
             }
-            moveAgentToTarget(player.transform);
+            
+
         }
 
-        private bool isPlayerInAttackRange() {
+        private bool isPlayerInRange(float range) {
             Vector3 playerPos = player.transform.position;
             Vector3 selfPos = gameObject.transform.position;
             if (Math.Abs(playerPos.y - selfPos.y) > maxHeightDifferenceForEffectiveAttack) return false;
-            return Vector3.Distance(playerPos, selfPos) < attackRange;
+            return Vector3.Distance(playerPos, selfPos) < range;
         }
 
         private void attack() {
@@ -104,6 +113,7 @@ namespace CharacterControllers {
         }
 
         public void receiveSpell(Spell spell) {
+            isInBattleStatus = true;
             characterStatus.onReceivingSpell(spell);
         }
     }
