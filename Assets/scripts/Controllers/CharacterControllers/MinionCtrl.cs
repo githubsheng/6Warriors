@@ -69,10 +69,19 @@ namespace CharacterControllers {
                 moveAgentToTarget(player.transform);
             }
             else if (isPlayerInRange(alertRange)) {
-                isInBattleStatus = true;
+                alertGroup();
             }
-            
+        }
 
+        private void alertGroup() {
+            MinionCtrl[] minionCtrls = transform.parent.GetComponentsInChildren<MinionCtrl>();
+            for (int i = 0; i < minionCtrls.Length; i++) {
+                minionCtrls[i].enterBattleStatus();
+            }
+        }
+
+        public void enterBattleStatus() {
+            isInBattleStatus = true;
         }
 
         private bool isPlayerInRange(float range) {
@@ -113,7 +122,7 @@ namespace CharacterControllers {
         }
 
         public void receiveSpell(Spell spell) {
-            isInBattleStatus = true;
+            if(!isInBattleStatus) alertGroup();
             characterStatus.onReceivingSpell(spell);
         }
     }
