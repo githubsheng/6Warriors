@@ -18,6 +18,7 @@ namespace CharacterControllers {
         private float freezeUntil;
         private int attackAnimationValUsed;
         private Transform arrowSpawnPos;
+        private Vector3 playerChestPosition;
 
         private Camera mainCamera;
         
@@ -74,8 +75,12 @@ namespace CharacterControllers {
                 Ray camRay = mainCamera.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hit;
                 if (Physics.Raycast(camRay, out hit, camRayLength, turnDetectionMask)) {
+                    //todo: add comments why we need chest position.
+                    //todo: make 1.7f constant
+                    Vector3 pos = transform.position;
+                    playerChestPosition.Set(pos.x, 1.7f, pos.z);
                     //cache the moue pos to avoid extra ray casts
-                    playerToMouse = hit.point - transform.position;
+                    playerToMouse = hit.point - playerChestPosition;
                     playerToMouse.y = 0;
                     playerToMouse = Vector3.Normalize(playerToMouse);
                     Quaternion newRotation = Quaternion.LookRotation(playerToMouse);
@@ -95,6 +100,9 @@ namespace CharacterControllers {
 
         private void spawnArrow() {
             Vector3 spawnPos = arrowSpawnPos.position;
+            //todo: first we need to check if the mouse is pointing at a enemy, only if it missed out, will we
+            //todo: resolve to direction mask.
+            //todo: sometimes, when firing consecutively, the player is not facing the core
             Ray camRay = mainCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             if (Physics.Raycast(camRay, out hit, camRayLength, arrowDirectionMask)) {
@@ -105,7 +113,6 @@ namespace CharacterControllers {
                 ArrowAttack arrowAttack = darkArrow.GetComponent<ArrowAttack>();
                 arrowAttack.setAttackAttrib(Spell.createPhysicalAttack(10), hitToSpawn);
             }
-            
         }
 
         private void tryAttack() {
@@ -116,8 +123,6 @@ namespace CharacterControllers {
             animator.SetInteger(commonAnimationParam, attack01AnimationVal);
             spawnArrow();
         }
-
-        
         
         public void onAttackFinish()
         {
