@@ -3176,7 +3176,7 @@ GameObject:
   m_Component:
   - component: {fileID: 742503553}
   m_Layer: 0
-  m_Name: group01
+  m_Name: group02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5628,7 +5628,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1682830184
 Transform:
   m_ObjectHideFlags: 0
@@ -6812,17 +6812,17 @@ PrefabInstance:
     - target: {fileID: 2577700882632633431, guid: 6a2e39934dd8e41d6bfa6f71169000cb,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -27.7
       objectReference: {fileID: 0}
     - target: {fileID: 2577700882632633431, guid: 6a2e39934dd8e41d6bfa6f71169000cb,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -2.71
       objectReference: {fileID: 0}
     - target: {fileID: 2577700882632633431, guid: 6a2e39934dd8e41d6bfa6f71169000cb,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -234.8
       objectReference: {fileID: 0}
     - target: {fileID: 2577700882632633431, guid: 6a2e39934dd8e41d6bfa6f71169000cb,
         type: 3}
@@ -6863,6 +6863,10 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 531458344, guid: 6a2e39934dd8e41d6bfa6f71169000cb, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6a2e39934dd8e41d6bfa6f71169000cb, type: 3}

@@ -59,8 +59,8 @@ namespace CharacterControllers
             maxMana = maxBaseMana;
             this.baseAttackStrengh = baseAttackStrengh;
             this.baseMagicPower = baseMagicPower;
-            baseHpRegerationPerSecond = 5;
-            baseManaRegeratoinPerSecond = 10;
+            baseHpRegerationPerSecond = 3;
+            baseManaRegeratoinPerSecond = 3;
             _expectedNextEvaluationTime = 0;
             hitChance = 100;
             //all base arm, (all kinds of) base magic resistance are 0 by default.

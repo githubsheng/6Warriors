@@ -41,11 +41,18 @@ namespace CharacterControllers {
         public float floatingHealthBarUpwardsOffset;
         public float alertRange;
 
-        
+        private void Awake() {
+            //todo: hmmm, considering changing this constructor..?
+            characterStatus = new CharacterStatus(maxBaseHp, maxBaseMana, baseAttackStrength, baseMagicPower);
+            characterStatus.baseHpRegerationPerSecond = 0;
+        }
+
+
         private void Start() {
             player = GameObject.FindWithTag("Player");
+            playerCtrl = player.GetComponent<PlayerCtrl>();
             animator = gameObject.GetComponentInChildren<Animator>();
-            characterStatus = new CharacterStatus(maxBaseHp, maxBaseMana, baseAttackStrength, baseMagicPower);
+
             agent =  GetComponent<NavMeshAgent>();
             attackAnimationVals = new []{attack01AnimationVal, attack02AnimationVal, attack01AnimationVal, attack02AnimationVal, attack03AnimationVal};
             floatingHealthBar = Instantiate(floatingHealthBarPrefab, transform);
@@ -97,7 +104,8 @@ namespace CharacterControllers {
             freezeUntil = float.MaxValue;
             attackAnimationIdxUsed = (++attackAnimationIdxUsed) % attackAnimationVals.Length;
             animator.SetInteger(commonAnimationParam, attackAnimationVals[attackAnimationIdxUsed]);
-            //todo: finish attack logic.
+            //todo: attack animation delay for each animation type, and for each minion type (public fields)
+            playerCtrl.receiveSpell(Spell.createPhysicalAttack(5));
         }
         
         public void onAttackFinish()

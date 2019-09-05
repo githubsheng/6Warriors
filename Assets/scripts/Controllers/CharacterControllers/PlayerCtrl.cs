@@ -19,6 +19,8 @@ namespace CharacterControllers {
         private int attackAnimationValUsed;
         private Transform arrowSpawnPos;
         private Vector3 playerChestPosition;
+        private OrbFill hpOrbFill;
+        private OrbFill mpOrbFill;
 
         private Camera mainCamera;
         
@@ -47,10 +49,14 @@ namespace CharacterControllers {
             characterStatus = new CharacterStatus(maxBaseHp, maxBaseMana, baseAttackStrength, baseMagicPower);
             arrowSpawnPos = transform.Find("arrow_spawn_pos");
             mainCamera = Camera.main;
+            hpOrbFill = GameObject.Find("player_hp_fill").GetComponent<OrbFill>();
+            mpOrbFill = GameObject.Find("player_mp_fill").GetComponent<OrbFill>();
         }
        
         private void Update() {
             characterStatus.reEvaluateStatusEverySecond();
+            hpOrbFill.Fill = (float) characterStatus.hp / characterStatus.maxHp;
+            mpOrbFill.Fill = (float) characterStatus.mana / characterStatus.maxMana;
             if (characterStatus.isDead) {
                 onKilled();
                 return;
@@ -102,7 +108,6 @@ namespace CharacterControllers {
             Vector3 spawnPos = arrowSpawnPos.position;
             //todo: first we need to check if the mouse is pointing at a enemy, only if it missed out, will we
             //todo: resolve to direction mask.
-            //todo: sometimes, when firing consecutively, the player is not facing the core
             Ray camRay = mainCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             if (Physics.Raycast(camRay, out hit, camRayLength, arrowDirectionMask)) {
@@ -119,6 +124,8 @@ namespace CharacterControllers {
             if (Time.time <= freezeUntil) return;
             if (!isAttackKeyPressed()) return;
             freezeUntil = float.MaxValue;
+            //todo: actual mana reduced need to correspond to spell
+            characterStatus.mana -= 5;
             attackAnimationValUsed = attack01AnimationVal;
             animator.SetInteger(commonAnimationParam, attack01AnimationVal);
             spawnArrow();
@@ -133,11 +140,16 @@ namespace CharacterControllers {
                     : attack01AnimationVal;
                 tryTurn();
                 animator.SetInteger(commonAnimationParam, attackAnimationValUsed);
+                characterStatus.mana -= 5;
                 spawnArrow();
             }
             else {
                 freezeUntil = Time.time;
             }
+        }
+        
+        public void receiveSpell(Spell spell) {
+            characterStatus.onReceivingSpell(spell);
         }
         
         private void onKilled()
