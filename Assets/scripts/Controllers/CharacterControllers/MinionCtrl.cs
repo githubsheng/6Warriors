@@ -23,10 +23,9 @@ namespace CharacterControllers {
         public int attackRange;
         public int maxHeightDifferenceForEffectiveAttack;
         
-        public int maxBaseHp;
-        public int maxBaseMana;
-        public int baseAttackStrength;
-        public int baseMagicPower;
+        public float maxBaseHp;
+        public float maxBaseMana;
+        public float baseAttackStrength;
         
         public int runAnimationVal;
         //todo: if no input for a time, go back to idle mode
@@ -43,7 +42,7 @@ namespace CharacterControllers {
 
         private void Awake() {
             //todo: hmmm, considering changing this constructor..?
-            characterStatus = new CharacterStatus(maxBaseHp, maxBaseMana, baseAttackStrength, baseMagicPower);
+            characterStatus = new CharacterStatus(maxBaseHp, maxBaseMana, baseAttackStrength);
             characterStatus.baseHpRegerationPerSecond = 0;
         }
 

@@ -9569,11 +9569,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: player
       objectReference: {fileID: 0}
-    - target: {fileID: 2577700882632633430, guid: 6a2e39934dd8e41d6bfa6f71169000cb,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 2577700882632633431, guid: 6a2e39934dd8e41d6bfa6f71169000cb,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -9587,7 +9582,7 @@ PrefabInstance:
     - target: {fileID: 2577700882632633431, guid: 6a2e39934dd8e41d6bfa6f71169000cb,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -234.8
+      value: -212.9
       objectReference: {fileID: 0}
     - target: {fileID: 2577700882632633431, guid: 6a2e39934dd8e41d6bfa6f71169000cb,
         type: 3}
@@ -9629,35 +9624,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 531458344, guid: 6a2e39934dd8e41d6bfa6f71169000cb, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 1.7
-      objectReference: {fileID: 0}
-    - target: {fileID: 1191296978, guid: 6a2e39934dd8e41d6bfa6f71169000cb, type: 3}
-      propertyPath: darkArrowPrefab
-      value: 
-      objectReference: {fileID: 4214838243535564070, guid: 3e9a002307fc949a6abd9b15fdec565c,
-        type: 3}
-    - target: {fileID: 1191296978, guid: 6a2e39934dd8e41d6bfa6f71169000cb, type: 3}
-      propertyPath: demonArrowPrefab
-      value: 
-      objectReference: {fileID: 4214838243535564070, guid: 3e9a002307fc949a6abd9b15fdec565c,
-        type: 3}
-    - target: {fileID: 1191296978, guid: 6a2e39934dd8e41d6bfa6f71169000cb, type: 3}
-      propertyPath: fireArrowPrefab
-      value: 
-      objectReference: {fileID: 7432694598718285855, guid: c29ec49250c40487db1dba8a92078687,
-        type: 3}
-    - target: {fileID: 1191296978, guid: 6a2e39934dd8e41d6bfa6f71169000cb, type: 3}
-      propertyPath: iceArrowPrefab
-      value: 
-      objectReference: {fileID: 54433389791835820, guid: 71b440df7d1e24131a90aba1c7ba1f68,
-        type: 3}
-    - target: {fileID: 1191296978, guid: 6a2e39934dd8e41d6bfa6f71169000cb, type: 3}
-      propertyPath: poisonArrowPrefab
-      value: 
-      objectReference: {fileID: 7037187407442897889, guid: 6f45ced04b74c4751af0d1a89ba0c83a,
-        type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6a2e39934dd8e41d6bfa6f71169000cb, type: 3}
 --- !u!1001 &9132187621045296587

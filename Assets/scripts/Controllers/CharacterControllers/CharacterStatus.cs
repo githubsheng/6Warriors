@@ -10,36 +10,28 @@ namespace CharacterControllers
     public class CharacterStatus
     {
     
-        public int maxBaseHp;
-        public int maxBaseMana;
-        public int maxHp;
-        public int maxMana;
-        public int baseAttackStrengh;
-        public int baseMagicPower;
-        public int baseHpRegerationPerSecond;
-        public int baseManaRegeratoinPerSecond;
-        public int baseArmor;
-        public int baseMagicResistence;
-        public int baseFireResistence;
-        public int baseIceResistence;
-        public int baseDodgeChance;
+        public float maxBaseHp;
+        public float maxBaseMana;
+        public float maxHp;
+        public float maxMana;
+        public float baseAttackStrengh;
+        public float baseHpRegerationPerSecond;
+        public float baseManaRegeratoinPerSecond;
+        public float baseArmor;
+        public float baseMagicResistence;
+        public float baseFireResistence;
+        public float baseIceResistence;
+        public float baseDodgeChance;
         
-        public int hp;
-        public int mana;
-        public int attackStrengh;
-        public int magicPower;
-        public int armor;
-        public int magicResistence;
-        public int fireResistence;
-        public int iceResistence;
-        // 0 - 100
-        public int dodgeChance;
-        // by default it is 100, if blind, set to something like 20
-        public int hitChance;
-        
+        public float hp;
+        public float mana;
+        public float attackStrengh;
+        public float armor;
+        public float poisonResistence;
+        public float fireResistence;
+        public float iceResistence;
         public bool isDead;
         public int isPoisoned;
-        public int isBlind;
     
         private float _expectedNextEvaluationTime;
     
@@ -49,7 +41,7 @@ namespace CharacterControllers
         private Random _random = new Random();
         
         
-        public CharacterStatus(int maxBaseHp, int maxBaseMana, int baseAttackStrengh, int baseMagicPower)
+        public CharacterStatus(float maxBaseHp, float maxBaseMana, float baseAttackStrengh)
         {
             hp = maxBaseHp;
             mana = maxBaseMana;
@@ -58,57 +50,30 @@ namespace CharacterControllers
             maxHp = maxBaseHp;
             maxMana = maxBaseMana;
             this.baseAttackStrengh = baseAttackStrengh;
-            this.baseMagicPower = baseMagicPower;
             baseHpRegerationPerSecond = 3;
             baseManaRegeratoinPerSecond = 3;
             _expectedNextEvaluationTime = 0;
-            hitChance = 100;
-            //all base arm, (all kinds of) base magic resistance are 0 by default.
         }
     
-        private bool isDodgingDamage()
+        private float calculateReceivedDamage(Spell effect)
         {
-            var dodge = _random.Next(100);
-            return dodge < dodgeChance;
+            float damage = effect.attackStrength - armor;
+            if (effect.magicType == Spell.MAGIC_TYPE_ICE) damage -= iceResistence;
+            if (effect.magicType == Spell.MAGIC_TYPE_FIRE) damage -= fireResistence;
+            if (effect.magicType == Spell.MAGIC_TYPE_POISION) damage -= poisonResistence;
+            return damage;
         }
-    
-        private int calculateReceivedPhysicalDamage(Spell effect)
-        {
-            return effect.physicalAttackStrengh - armor;
-        }
-    
-        private int calclulateReceivedMagicDamage(Spell effect)
-        {
-            return  effect.magicalAttackPower - magicResistence;
-        }
-    
-        private int calculateReceivedIceMagicDamage(Spell effect)
-        {
-            return effect.magicalAttackPower - iceResistence - magicResistence;
-        }
-    
-        private int calculateReceivedFireMagicDamage(Spell effect)
-        {
-            return effect.magicalAttackPower - fireResistence - magicResistence;
-        }
+
     
         public void onReceivingSpell(Spell spell)
         {
-            int damage = 0;
-            if (isDodgingDamage()) return;
             if (spell.buff != null)
             {
                 //todo: check if spell is already there. if it is, simply reset its duration
                 buffs.Add(spell.buff);
                 spell.buff.onAddingBuffer(this);
             }
-            
-            damage += calculateReceivedPhysicalDamage(spell);
-            damage += calclulateReceivedMagicDamage(spell);
-            damage += calculateReceivedIceMagicDamage(spell);
-            damage += calculateReceivedFireMagicDamage(spell);
-      
-            hp -= damage;
+            hp -=  calculateReceivedDamage(spell);
             if (hp <= 0)
             {
                 isDead = true;

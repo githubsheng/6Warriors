@@ -1,23 +1,28 @@
 using System.Collections.Generic;
 using Buffs;
+using UnityEngine;
 
 namespace Spells
 {
     public class Spell {
-        public int physicalAttackStrengh;
-        public int magicalAttackPower;
+        public float attackStrength;
         public int magicType;
-        public int hpHeal;
-        public int manaHeal;
+        public float hpHeal;
+        public float manaHeal;
+        public float manaConsumed;
+        public float manaGenerated;
         public CharacterBuff buff;
+        public GameObject prefab;
 
         public static readonly int MAGIC_TYPE_FIRE = 1;
         public static readonly int MAGIC_TYPE_ICE = 2;
-
-        public static Spell createPhysicalAttack(int physicalAttackStrength) {
-            Spell spell = new Spell {physicalAttackStrengh = physicalAttackStrength};
+        public static readonly int MAGIC_TYPE_POISION = 3;
+        
+        public static Spell createPhysicalAttack(float physicalAttackStrength) {
+            Spell spell = new Spell {attackStrength = physicalAttackStrength};
             return spell;
         }
+
 
     }
     

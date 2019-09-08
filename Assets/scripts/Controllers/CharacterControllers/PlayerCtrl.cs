@@ -21,6 +21,7 @@ namespace CharacterControllers {
         private Vector3 playerChestPosition;
         private OrbFill hpOrbFill;
         private OrbFill mpOrbFill;
+        private float attackInterval;
 
         private Camera mainCamera;
         
@@ -32,10 +33,10 @@ namespace CharacterControllers {
         public int attack02AnimationVal;
         public int dieAnimationVal;
         
-        public int maxBaseHp;
-        public int maxBaseMana;
-        public int baseAttackStrength;
-        public int baseMagicPower;
+        public float maxBaseHp;
+        public float maxBaseMana;
+        public float baseAttackStrength;
+        public float baseMagicPower;
        
         public int camRayLength;
         
@@ -49,25 +50,37 @@ namespace CharacterControllers {
         private void Start() {
             unityCharacterController = gameObject.GetComponent<CharacterController>();
             animator = gameObject.GetComponentInChildren<Animator>();
-            characterStatus = new CharacterStatus(maxBaseHp, maxBaseMana, baseAttackStrength, baseMagicPower);
+            characterStatus = new CharacterStatus(maxBaseHp, maxBaseMana, baseAttackStrength);
             arrowSpawnPos = transform.Find("arrow_spawn_pos");
             mainCamera = Camera.main;
             hpOrbFill = GameObject.Find("player_hp_fill").GetComponent<OrbFill>();
             mpOrbFill = GameObject.Find("player_mp_fill").GetComponent<OrbFill>();
+            attackInterval = getAttackAnimationLength();
+        }
+
+        private float getAttackAnimationLength() {
+            AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
+            for (int i = 0; i < clips.Length; i++) {
+                if (clips[i].name == "AttackCrossbow_fixed [10]") {
+                    return clips[i].length;
+                }
+            }
+            return 100f;
         }
        
-        private void Update() {
+        private void FixedUpdate() {
             characterStatus.reEvaluateStatusEverySecond();
-            hpOrbFill.Fill = (float) characterStatus.hp / characterStatus.maxHp;
-            mpOrbFill.Fill = (float) characterStatus.mana / characterStatus.maxMana;
+            hpOrbFill.Fill = characterStatus.hp / characterStatus.maxHp;
+            mpOrbFill.Fill = characterStatus.mana / characterStatus.maxMana;
             if (characterStatus.isDead) {
                 onKilled();
                 return;
             }
+
             tryBecomeReady();
             tryTurn();
             tryMove();
-            tryAttack();
+            tryAttack();  
         }
         
         private bool isAttackKeyPressed() {
@@ -107,7 +120,12 @@ namespace CharacterControllers {
             }
         }
 
-        private void spawnArrow() {
+        private void castSpell(Spell spell, int animationVal) {
+            characterStatus.mana -= (int)spell.manaConsumed;
+            characterStatus.mana += (int) spell.manaGenerated;
+            Debug.Log(animationVal);
+            animator.SetInteger(commonAnimationParam, animationVal);
+            
             Vector3 spawnPos = arrowSpawnPos.position;
             //todo: first we need to check if the mouse is pointing at a enemy, only if it missed out, will we
             //todo: resolve to direction mask.
@@ -117,55 +135,40 @@ namespace CharacterControllers {
                 //cache the moue pos to avoid extra ray casts
                 Vector3 hitToSpawn = hit.point - spawnPos;
                 hitToSpawn = Vector3.Normalize(hitToSpawn);
-
-                GameObject arrowPrefab;
-                Spell spell;
-
-                if (Input.GetKey(KeyCode.Q)) {
-                    arrowPrefab = demonArrowPrefab;
-                    spell = Spell.createPhysicalAttack(10);
-                } else if (Input.GetKey(KeyCode.W)) {
-                    arrowPrefab = fireArrowPrefab;
-                    spell = Spell.createPhysicalAttack(10);                    
-                } else if (Input.GetKey(KeyCode.E)) {
-                    arrowPrefab = iceArrowPrefab;
-                    spell = Spell.createPhysicalAttack(10);
-                } else {
-                    //is F
-                    arrowPrefab = poisonArrowPrefab;
-                    spell = Spell.createPhysicalAttack(10);
-                }
-                GameObject darkArrow = Instantiate(arrowPrefab, spawnPos, Quaternion.LookRotation(hitToSpawn));
+                Debug.Log("instatiated");
+                GameObject darkArrow = Instantiate(spell.prefab, spawnPos, Quaternion.LookRotation(hitToSpawn));
                 ArrowAttack arrowAttack = darkArrow.GetComponent<ArrowAttack>();
-                //todo: based on the key pressed, set different spells here.
-                arrowAttack.setAttackAttrib(spell, hitToSpawn);      
+                arrowAttack.setAttackAttrib(spell, hitToSpawn);  
             }
         }
 
         private void tryAttack() {
             if (Time.time <= freezeUntil) return;
             if (!isAttackKeyPressed()) return;
-            freezeUntil = float.MaxValue;
-            //todo: actual mana reduced need to correspond to spell
-            characterStatus.mana -= 5;
-            attackAnimationValUsed = attack01AnimationVal;
-            animator.SetInteger(commonAnimationParam, attack01AnimationVal);
-            spawnArrow();
+            Spell spell = getSpell();
+            if (characterStatus.mana < spell.manaConsumed) return;
+            freezeUntil = Time.time + attackInterval;
+            //check the animator controller to see how this code make sense...
+            //TODO: add comments about the weird behaviors
+            AnimatorStateInfo currentAnimation = animator.GetCurrentAnimatorStateInfo(0);
+            if (currentAnimation.IsName("AttackCrossbow [10]")) {
+                castSpell(spell, attack02AnimationVal);                
+            } else {
+                castSpell(spell, attack01AnimationVal);   
+            }
         }
         
-        public void onAttackFinish()
-        {
-            if (isAttackKeyPressed()) {
-                //keep "freeze" status
-                attackAnimationValUsed = attackAnimationValUsed == attack01AnimationVal
-                    ? attack02AnimationVal
-                    : attack01AnimationVal;
-                tryTurn();
-                animator.SetInteger(commonAnimationParam, attackAnimationValUsed);
-                characterStatus.mana -= 5;
-                spawnArrow();
+        private Spell getSpell() {
+            //todo: weapon addition, needs to get from player gear...
+            if (Input.GetKey(KeyCode.Q)) {
+                return PlayerSpells.getDemonArrow(1f, 1, demonArrowPrefab);
+            } else if (Input.GetKey(KeyCode.W)) {
+                return PlayerSpells.getFireArrow(1f, 1, fireArrowPrefab);
+            } else if (Input.GetKey(KeyCode.E)) {
+                return PlayerSpells.getIceArrow(1f, 1, iceArrowPrefab);
             } else {
-                freezeUntil = Time.time;
+                //is F
+                return PlayerSpells.getPoisonArrow(1f, 1, poisonArrowPrefab);
             }
         }
         
