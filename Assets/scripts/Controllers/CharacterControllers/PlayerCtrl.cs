@@ -41,7 +41,10 @@ namespace CharacterControllers {
         
         public int movementSpeed;
 
-        public GameObject darkArrowPrefab;
+        public GameObject demonArrowPrefab;
+        public GameObject fireArrowPrefab;
+        public GameObject iceArrowPrefab;
+        public GameObject poisonArrowPrefab;
         
         private void Start() {
             unityCharacterController = gameObject.GetComponent<CharacterController>();
@@ -114,9 +117,28 @@ namespace CharacterControllers {
                 //cache the moue pos to avoid extra ray casts
                 Vector3 hitToSpawn = hit.point - spawnPos;
                 hitToSpawn = Vector3.Normalize(hitToSpawn);
-                GameObject darkArrow = Instantiate(darkArrowPrefab, spawnPos, Quaternion.LookRotation(hitToSpawn));
+
+                GameObject arrowPrefab;
+                Spell spell;
+
+                if (Input.GetKey(KeyCode.Q)) {
+                    arrowPrefab = demonArrowPrefab;
+                    spell = Spell.createPhysicalAttack(10);
+                } else if (Input.GetKey(KeyCode.W)) {
+                    arrowPrefab = fireArrowPrefab;
+                    spell = Spell.createPhysicalAttack(10);                    
+                } else if (Input.GetKey(KeyCode.E)) {
+                    arrowPrefab = iceArrowPrefab;
+                    spell = Spell.createPhysicalAttack(10);
+                } else {
+                    //is F
+                    arrowPrefab = poisonArrowPrefab;
+                    spell = Spell.createPhysicalAttack(10);
+                }
+                GameObject darkArrow = Instantiate(arrowPrefab, spawnPos, Quaternion.LookRotation(hitToSpawn));
                 ArrowAttack arrowAttack = darkArrow.GetComponent<ArrowAttack>();
-                arrowAttack.setAttackAttrib(Spell.createPhysicalAttack(10), hitToSpawn);
+                //todo: based on the key pressed, set different spells here.
+                arrowAttack.setAttackAttrib(spell, hitToSpawn);      
             }
         }
 
@@ -142,8 +164,7 @@ namespace CharacterControllers {
                 animator.SetInteger(commonAnimationParam, attackAnimationValUsed);
                 characterStatus.mana -= 5;
                 spawnArrow();
-            }
-            else {
+            } else {
                 freezeUntil = Time.time;
             }
         }
