@@ -15,10 +15,12 @@ namespace CharacterControllers {
         private int commonAnimationParam = Animator.StringToHash("animationStatus");
         private int attackAnimationIdxUsed;
         private int[] attackAnimationVals;
+        private float[] attackAnimationClipLengths;
         private float freezeUntil;
         private GameObject floatingHealthBar;
         private FloatingHealthBar healthBarCtr;
         private bool isInBattleStatus;
+
         
         public int attackRange;
         public int maxHeightDifferenceForEffectiveAttack;
@@ -52,13 +54,44 @@ namespace CharacterControllers {
             playerCtrl = player.GetComponent<PlayerCtrl>();
             animator = gameObject.GetComponentInChildren<Animator>();
 
+
             agent =  GetComponent<NavMeshAgent>();
             attackAnimationVals = new []{attack01AnimationVal, attack02AnimationVal, attack01AnimationVal, attack02AnimationVal, attack03AnimationVal};
+            getAttackAnimationLength();
             floatingHealthBar = Instantiate(floatingHealthBarPrefab, transform);
             healthBarCtr = floatingHealthBar.GetComponent<FloatingHealthBar>();
             healthBarCtr.setHealthBarAttrib(floatingHealthBarUpwardsOffset);
         }
-        
+
+        private void getAttackAnimationLength()
+        {
+            attackAnimationClipLengths = new float[5];
+            AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
+            for (int i = 0; i < clips.Length; i++)
+            {
+                Debug.Log(clips[i].name);
+                switch(clips[i].name)
+                {
+                    case "AttackOne":
+                        attackAnimationClipLengths[0] = clips[i].length;
+                        attackAnimationClipLengths[2] = clips[i].length;
+                        break;
+                    case "AttackTwo":
+                        attackAnimationClipLengths[1] = clips[i].length;
+                        attackAnimationClipLengths[3] = clips[i].length;
+                        break;
+                    case "AttackThree":
+                        attackAnimationClipLengths[4] = clips[i].length;
+                        break;
+                }
+            }
+
+            for(int i = 0; i < attackAnimationClipLengths.Length; i++)
+            {
+                Debug.Log(attackAnimationClipLengths[i]);
+            }
+        }
+
         private void Update() {
             if (isInBattleStatus) {
                 characterStatus.reEvaluateStatusEverySecond();
@@ -100,16 +133,12 @@ namespace CharacterControllers {
         private void attack() {
             //pause movement first
             agent.isStopped = true;
-            freezeUntil = float.MaxValue;
             attackAnimationIdxUsed = (++attackAnimationIdxUsed) % attackAnimationVals.Length;
             animator.SetInteger(commonAnimationParam, attackAnimationVals[attackAnimationIdxUsed]);
-            //todo: attack animation delay for each animation type, and for each minion type (public fields)
+            float attackAnimationTime = attackAnimationClipLengths[attackAnimationIdxUsed];
+            freezeUntil = Time.time + attackAnimationTime;
+            //todo: should have different attacks props set by public fields.
             playerCtrl.receiveSpell(Spell.createPhysicalAttack(5));
-        }
-        
-        public void onAttackFinish()
-        {
-            freezeUntil = Time.time;
         }
         
         private void moveAgentToTarget(Transform target)

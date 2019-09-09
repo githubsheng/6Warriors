@@ -9,7 +9,9 @@ namespace CharacterControllers
 {
     public class CharacterStatus
     {
-    
+        public int playerLevel = 1;
+        public float weaponAddition = 0;
+        public float armor;
         public float maxBaseHp;
         public float maxBaseMana;
         public float maxHp;
@@ -17,16 +19,13 @@ namespace CharacterControllers
         public float baseAttackStrengh;
         public float baseHpRegerationPerSecond;
         public float baseManaRegeratoinPerSecond;
-        public float baseArmor;
         public float baseMagicResistence;
         public float baseFireResistence;
         public float baseIceResistence;
         public float baseDodgeChance;
-        
         public float hp;
         public float mana;
         public float attackStrengh;
-        public float armor;
         public float poisonResistence;
         public float fireResistence;
         public float iceResistence;

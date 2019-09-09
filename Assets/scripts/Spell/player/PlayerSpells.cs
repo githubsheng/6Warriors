@@ -1,3 +1,4 @@
+using CharacterControllers;
 using UnityEngine;
 
 namespace Spells.ArrowAttack {
@@ -38,33 +39,33 @@ namespace Spells.ArrowAttack {
             };
         }
 
-        private static void adjustStrength(Spell spell, float weaponAddition, int playerLevel) {
-            spell.attackStrength *= playerLevel - 1; 
-            spell.attackStrength += weaponAddition;
+        private static void adjustStrength(Spell spell, CharacterStatus characterStatus) {
+            spell.attackStrength += characterStatus.playerLevel - 1; 
+            spell.attackStrength += characterStatus.weaponAddition;
         }
 
-        public static Spell getDemonArrow(float weaponAddition, int playerLevel, GameObject prefab) {
+        public static Spell getDemonArrow(CharacterStatus characterStatus, GameObject prefab) {
             Spell spell = getBaseDemonArrow(prefab);
-            adjustStrength(spell, weaponAddition, playerLevel);
+            adjustStrength(spell, characterStatus);
             return spell;
         }
         
-        public static Spell getFireArrow(float weaponAddition, int playerLevel, GameObject prefab) {
+        public static Spell getFireArrow(CharacterStatus characterStatus, GameObject prefab) {
             Spell spell = getBaseFireArrow(prefab);
-            adjustStrength(spell, weaponAddition, playerLevel);
+            adjustStrength(spell, characterStatus);
             return spell;
         }
 
         
-        public static Spell getIceArrow(float weaponAddition, int playerLevel, GameObject prefab) {
+        public static Spell getIceArrow(CharacterStatus characterStatus, GameObject prefab) {
             Spell spell = getBaseIceArrow(prefab);
-            adjustStrength(spell, weaponAddition, playerLevel);
+            adjustStrength(spell, characterStatus);
             return spell;
         }
         
-        public static Spell getPoisonArrow(float weaponAddition, int playerLevel, GameObject prefab) {
+        public static Spell getPoisonArrow(CharacterStatus characterStatus, GameObject prefab) {
             Spell spell = getBasePoisonArrow(prefab);
-            adjustStrength(spell, weaponAddition, playerLevel);
+            adjustStrength(spell, characterStatus);
             return spell;
         }
         

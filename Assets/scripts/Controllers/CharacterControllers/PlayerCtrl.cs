@@ -161,14 +161,14 @@ namespace CharacterControllers {
         private Spell getSpell() {
             //todo: weapon addition, needs to get from player gear...
             if (Input.GetKey(KeyCode.Q)) {
-                return PlayerSpells.getDemonArrow(1f, 1, demonArrowPrefab);
+                return PlayerSpells.getDemonArrow(characterStatus, demonArrowPrefab);
             } else if (Input.GetKey(KeyCode.W)) {
-                return PlayerSpells.getFireArrow(1f, 1, fireArrowPrefab);
+                return PlayerSpells.getFireArrow(characterStatus, fireArrowPrefab);
             } else if (Input.GetKey(KeyCode.E)) {
-                return PlayerSpells.getIceArrow(1f, 1, iceArrowPrefab);
+                return PlayerSpells.getIceArrow(characterStatus, iceArrowPrefab);
             } else {
                 //is F
-                return PlayerSpells.getPoisonArrow(1f, 1, poisonArrowPrefab);
+                return PlayerSpells.getPoisonArrow(characterStatus, poisonArrowPrefab);
             }
         }
         
