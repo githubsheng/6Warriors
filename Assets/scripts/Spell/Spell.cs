@@ -18,8 +18,8 @@ namespace Spells
         public static readonly int MAGIC_TYPE_ICE = 2;
         public static readonly int MAGIC_TYPE_POISION = 3;
         
-        public static Spell createPhysicalAttack(float physicalAttackStrength) {
-            Spell spell = new Spell {attackStrength = physicalAttackStrength};
+        public static Spell createNormalAttack(float attackStrength) {
+            Spell spell = new Spell {attackStrength = attackStrength };
             return spell;
         }
 

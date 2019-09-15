@@ -49,6 +49,8 @@ namespace CharacterControllers
             maxHp = maxBaseHp;
             maxMana = maxBaseMana;
             this.baseAttackStrengh = baseAttackStrengh;
+            //todo: a way to set weapon addition and update the attack strength.
+            this.attackStrengh = baseAttackStrengh;
             baseHpRegerationPerSecond = 3;
             baseManaRegeratoinPerSecond = 3;
             _expectedNextEvaluationTime = 0;

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Gui.HealthBar;
 using Spells;
 using UnityEngine;
@@ -21,6 +22,7 @@ namespace CharacterControllers {
         private FloatingHealthBar healthBarCtr;
         private bool isInBattleStatus;
         private GameObject pointedIndicator;
+        private Transform spellSpawnTransform;
 
         
         public int attackRange;
@@ -37,6 +39,12 @@ namespace CharacterControllers {
         public int attack01AnimationVal;
         public int attack02AnimationVal;
         public int attack03AnimationVal;
+        public bool isRanged;
+        public GameObject rangedAttackPrefab01;
+        public GameObject rangedAttackPrefab02;
+        public GameObject rangedAttackPrefab03;
+        private Dictionary<int, bool> isRangedAttackMap = new Dictionary<int, bool>();
+        private Dictionary<int, GameObject> rangedAttackPrefabs = new Dictionary<int, GameObject>();
         public int dieAnimationVal;
 
         public GameObject floatingHealthBarPrefab;
@@ -47,6 +55,14 @@ namespace CharacterControllers {
             //todo: hmmm, considering changing this constructor..?
             characterStatus = new CharacterStatus(maxBaseHp, maxBaseMana, baseAttackStrength);
             characterStatus.baseHpRegerationPerSecond = 0;
+            if(isRanged)
+            {
+                rangedAttackPrefabs[1] = rangedAttackPrefab01;
+                rangedAttackPrefabs[2] = rangedAttackPrefab02;
+                rangedAttackPrefabs[3] = rangedAttackPrefab03;
+                spellSpawnTransform = transform.Find("spell_spawn_pos");
+            }
+
         }
 
 
@@ -54,8 +70,6 @@ namespace CharacterControllers {
             player = GameObject.FindWithTag("Player");
             playerCtrl = player.GetComponent<PlayerCtrl>();
             animator = gameObject.GetComponentInChildren<Animator>();
-
-
             agent =  GetComponent<NavMeshAgent>();
             attackAnimationVals = new []{attack01AnimationVal, attack02AnimationVal, attack01AnimationVal, attack02AnimationVal, attack03AnimationVal};
             getAttackAnimationLength();
@@ -71,7 +85,6 @@ namespace CharacterControllers {
             AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
             for (int i = 0; i < clips.Length; i++)
             {
-                Debug.Log(clips[i].name);
                 switch(clips[i].name)
                 {
                     case "AttackOne":
@@ -86,11 +99,6 @@ namespace CharacterControllers {
                         attackAnimationClipLengths[4] = clips[i].length;
                         break;
                 }
-            }
-
-            for(int i = 0; i < attackAnimationClipLengths.Length; i++)
-            {
-                Debug.Log(attackAnimationClipLengths[i]);
             }
         }
 
@@ -129,6 +137,13 @@ namespace CharacterControllers {
             Vector3 playerPos = player.transform.position;
             Vector3 selfPos = gameObject.transform.position;
             if (Math.Abs(playerPos.y - selfPos.y) > maxHeightDifferenceForEffectiveAttack) return false;
+            if(isRanged)
+            {
+                //if is ranged, attack range may be very large, I need to cast an ray to see if there are walls between
+                //the minion and the player.
+                //todo: 
+                return Vector3.Distance(playerPos, selfPos) < range;
+            }
             return Vector3.Distance(playerPos, selfPos) < range;
         }
 
@@ -136,11 +151,25 @@ namespace CharacterControllers {
             //pause movement first
             agent.isStopped = true;
             attackAnimationIdxUsed = (++attackAnimationIdxUsed) % attackAnimationVals.Length;
-            animator.SetInteger(commonAnimationParam, attackAnimationVals[attackAnimationIdxUsed]);
+            int attackVal = attackAnimationVals[attackAnimationIdxUsed];
+            animator.SetInteger(commonAnimationParam, attackVal);
             float attackAnimationTime = attackAnimationClipLengths[attackAnimationIdxUsed];
             freezeUntil = Time.time + attackAnimationTime;
-            //todo: should have different attacks props set by public fields.
-            playerCtrl.receiveSpell(Spell.createPhysicalAttack(5));
+            Spell spell = Spell.createNormalAttack(characterStatus.attackStrengh);
+            if (isRanged)
+            {
+                GameObject rangedAttackPrefab = rangedAttackPrefabs[attackVal];
+                Vector3 spellSpawnPos = spellSpawnTransform.position;
+                Vector3 playerToSpellSpawn = player.transform.position - spellSpawnPos;
+                playerToSpellSpawn.y = 0;
+                GameObject rangedAttack = Instantiate(rangedAttackPrefab, spellSpawnPos, Quaternion.LookRotation(playerToSpellSpawn));
+                rangedAttack.GetComponent<MinionRangedAttack>().setAttackAttrib(spell, playerToSpellSpawn);
+            }
+            else
+            {
+                playerCtrl.receiveSpell(spell);
+            }
+
         }
         
         private void moveAgentToTarget(Transform target)
