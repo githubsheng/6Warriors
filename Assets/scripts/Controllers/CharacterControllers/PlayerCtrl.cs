@@ -123,9 +123,7 @@ namespace CharacterControllers {
         private void castSpell(Spell spell, int animationVal) {
             characterStatus.mana -= (int)spell.manaConsumed;
             characterStatus.mana += (int) spell.manaGenerated;
-            Debug.Log(animationVal);
             animator.SetInteger(commonAnimationParam, animationVal);
-            
             Vector3 spawnPos = arrowSpawnPos.position;
             //todo: first we need to check if the mouse is pointing at a enemy, only if it missed out, will we
             //todo: resolve to direction mask.
@@ -135,7 +133,6 @@ namespace CharacterControllers {
                 //cache the moue pos to avoid extra ray casts
                 Vector3 hitToSpawn = hit.point - spawnPos;
                 hitToSpawn = Vector3.Normalize(hitToSpawn);
-                Debug.Log("instatiated");
                 GameObject darkArrow = Instantiate(spell.prefab, spawnPos, Quaternion.LookRotation(hitToSpawn));
                 ArrowAttack arrowAttack = darkArrow.GetComponent<ArrowAttack>();
                 arrowAttack.setAttackAttrib(spell, hitToSpawn);  

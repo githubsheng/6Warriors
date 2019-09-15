@@ -165,12 +165,10 @@ namespace CharacterControllers {
         }
 
         public void enablePointedIndicator() {
-            Debug.Log("setting it to be active");
             pointedIndicator.SetActive(true);
         }
 
         public void disablePointedIndicator() {
-            Debug.Log("setting it to be inactive");
             pointedIndicator.SetActive(false);
         }
     }

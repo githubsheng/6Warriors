@@ -23,7 +23,7 @@ namespace Utilities {
             if(Physics.Raycast(ray, out hit, camRayLength, characterMask)) {
                 GameObject hitted = hit.collider.gameObject;
                 if (hitted != pointed && hitted.CompareTag("Enemy")) {
-                    if(pointed != empty) pointed.GetComponent<MinionCtrl>().disablePointedIndicator();
+                    if(pointed && pointed != empty) pointed.GetComponent<MinionCtrl>().disablePointedIndicator();
                     hitted.GetComponent<MinionCtrl>().enablePointedIndicator();
                     pointed = hitted;
                 }
