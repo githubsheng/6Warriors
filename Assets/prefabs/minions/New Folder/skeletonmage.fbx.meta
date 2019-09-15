@@ -1,0 +1,304 @@
+fileFormatVersion: 2
+guid: c5b0a9dd84ef04e4c9e57d3ce7fbb046
+ModelImporter:
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: creature/skeletonmage/skeletonmage
+    100002: creature/skeletonmage/skeletonmage 1
+    100004: creature/skeletonmage/skeletonmage_bone_0
+    100006: creature/skeletonmage/skeletonmage_bone_1
+    100008: creature/skeletonmage/skeletonmage_bone_10
+    100010: creature/skeletonmage/skeletonmage_bone_11
+    100012: creature/skeletonmage/skeletonmage_bone_12
+    100014: creature/skeletonmage/skeletonmage_bone_13
+    100016: creature/skeletonmage/skeletonmage_bone_14
+    100018: creature/skeletonmage/skeletonmage_bone_15
+    100020: creature/skeletonmage/skeletonmage_bone_16
+    100022: creature/skeletonmage/skeletonmage_bone_17
+    100024: creature/skeletonmage/skeletonmage_bone_18
+    100026: creature/skeletonmage/skeletonmage_bone_19
+    100028: creature/skeletonmage/skeletonmage_bone_2
+    100030: creature/skeletonmage/skeletonmage_bone_20
+    100032: creature/skeletonmage/skeletonmage_bone_21
+    100034: creature/skeletonmage/skeletonmage_bone_22
+    100036: creature/skeletonmage/skeletonmage_bone_23
+    100038: creature/skeletonmage/skeletonmage_bone_24
+    100040: creature/skeletonmage/skeletonmage_bone_25
+    100042: creature/skeletonmage/skeletonmage_bone_26
+    100044: creature/skeletonmage/skeletonmage_bone_27
+    100046: creature/skeletonmage/skeletonmage_bone_28
+    100048: creature/skeletonmage/skeletonmage_bone_29
+    100050: creature/skeletonmage/skeletonmage_bone_3
+    100052: creature/skeletonmage/skeletonmage_bone_30
+    100054: creature/skeletonmage/skeletonmage_bone_31
+    100056: creature/skeletonmage/skeletonmage_bone_32
+    100058: creature/skeletonmage/skeletonmage_bone_33
+    100060: creature/skeletonmage/skeletonmage_bone_34
+    100062: creature/skeletonmage/skeletonmage_bone_35
+    100064: creature/skeletonmage/skeletonmage_bone_36
+    100066: creature/skeletonmage/skeletonmage_bone_37
+    100068: creature/skeletonmage/skeletonmage_bone_38
+    100070: creature/skeletonmage/skeletonmage_bone_39
+    100072: creature/skeletonmage/skeletonmage_bone_4
+    100074: creature/skeletonmage/skeletonmage_bone_40
+    100076: creature/skeletonmage/skeletonmage_bone_41
+    100078: creature/skeletonmage/skeletonmage_bone_42
+    100080: creature/skeletonmage/skeletonmage_bone_43
+    100082: creature/skeletonmage/skeletonmage_bone_44
+    100084: creature/skeletonmage/skeletonmage_bone_45
+    100086: creature/skeletonmage/skeletonmage_bone_46
+    100088: creature/skeletonmage/skeletonmage_bone_47
+    100090: creature/skeletonmage/skeletonmage_bone_48
+    100092: creature/skeletonmage/skeletonmage_bone_49
+    100094: creature/skeletonmage/skeletonmage_bone_5
+    100096: creature/skeletonmage/skeletonmage_bone_50
+    100098: creature/skeletonmage/skeletonmage_bone_51
+    100100: creature/skeletonmage/skeletonmage_bone_52
+    100102: creature/skeletonmage/skeletonmage_bone_53
+    100104: creature/skeletonmage/skeletonmage_bone_54
+    100106: creature/skeletonmage/skeletonmage_bone_55
+    100108: creature/skeletonmage/skeletonmage_bone_56
+    100110: creature/skeletonmage/skeletonmage_bone_57
+    100112: creature/skeletonmage/skeletonmage_bone_58
+    100114: creature/skeletonmage/skeletonmage_bone_59
+    100116: creature/skeletonmage/skeletonmage_bone_6
+    100118: creature/skeletonmage/skeletonmage_bone_60
+    100120: creature/skeletonmage/skeletonmage_bone_61
+    100122: creature/skeletonmage/skeletonmage_bone_62
+    100124: creature/skeletonmage/skeletonmage_bone_63
+    100126: creature/skeletonmage/skeletonmage_bone_64
+    100128: creature/skeletonmage/skeletonmage_bone_65
+    100130: creature/skeletonmage/skeletonmage_bone_66
+    100132: creature/skeletonmage/skeletonmage_bone_67
+    100134: creature/skeletonmage/skeletonmage_bone_68
+    100136: creature/skeletonmage/skeletonmage_bone_69
+    100138: creature/skeletonmage/skeletonmage_bone_7
+    100140: creature/skeletonmage/skeletonmage_bone_70
+    100142: creature/skeletonmage/skeletonmage_bone_71
+    100144: creature/skeletonmage/skeletonmage_bone_72
+    100146: creature/skeletonmage/skeletonmage_bone_73
+    100148: creature/skeletonmage/skeletonmage_bone_74
+    100150: creature/skeletonmage/skeletonmage_bone_75
+    100152: creature/skeletonmage/skeletonmage_bone_76
+    100154: creature/skeletonmage/skeletonmage_bone_77
+    100156: creature/skeletonmage/skeletonmage_bone_78
+    100158: creature/skeletonmage/skeletonmage_bone_79
+    100160: creature/skeletonmage/skeletonmage_bone_8
+    100162: creature/skeletonmage/skeletonmage_bone_80
+    100164: creature/skeletonmage/skeletonmage_bone_81
+    100166: creature/skeletonmage/skeletonmage_bone_82
+    100168: creature/skeletonmage/skeletonmage_bone_83
+    100170: creature/skeletonmage/skeletonmage_bone_84
+    100172: creature/skeletonmage/skeletonmage_bone_9
+    100174: //RootNode
+    400000: creature/skeletonmage/skeletonmage
+    400002: creature/skeletonmage/skeletonmage 1
+    400004: creature/skeletonmage/skeletonmage_bone_0
+    400006: creature/skeletonmage/skeletonmage_bone_1
+    400008: creature/skeletonmage/skeletonmage_bone_10
+    400010: creature/skeletonmage/skeletonmage_bone_11
+    400012: creature/skeletonmage/skeletonmage_bone_12
+    400014: creature/skeletonmage/skeletonmage_bone_13
+    400016: creature/skeletonmage/skeletonmage_bone_14
+    400018: creature/skeletonmage/skeletonmage_bone_15
+    400020: creature/skeletonmage/skeletonmage_bone_16
+    400022: creature/skeletonmage/skeletonmage_bone_17
+    400024: creature/skeletonmage/skeletonmage_bone_18
+    400026: creature/skeletonmage/skeletonmage_bone_19
+    400028: creature/skeletonmage/skeletonmage_bone_2
+    400030: creature/skeletonmage/skeletonmage_bone_20
+    400032: creature/skeletonmage/skeletonmage_bone_21
+    400034: creature/skeletonmage/skeletonmage_bone_22
+    400036: creature/skeletonmage/skeletonmage_bone_23
+    400038: creature/skeletonmage/skeletonmage_bone_24
+    400040: creature/skeletonmage/skeletonmage_bone_25
+    400042: creature/skeletonmage/skeletonmage_bone_26
+    400044: creature/skeletonmage/skeletonmage_bone_27
+    400046: creature/skeletonmage/skeletonmage_bone_28
+    400048: creature/skeletonmage/skeletonmage_bone_29
+    400050: creature/skeletonmage/skeletonmage_bone_3
+    400052: creature/skeletonmage/skeletonmage_bone_30
+    400054: creature/skeletonmage/skeletonmage_bone_31
+    400056: creature/skeletonmage/skeletonmage_bone_32
+    400058: creature/skeletonmage/skeletonmage_bone_33
+    400060: creature/skeletonmage/skeletonmage_bone_34
+    400062: creature/skeletonmage/skeletonmage_bone_35
+    400064: creature/skeletonmage/skeletonmage_bone_36
+    400066: creature/skeletonmage/skeletonmage_bone_37
+    400068: creature/skeletonmage/skeletonmage_bone_38
+    400070: creature/skeletonmage/skeletonmage_bone_39
+    400072: creature/skeletonmage/skeletonmage_bone_4
+    400074: creature/skeletonmage/skeletonmage_bone_40
+    400076: creature/skeletonmage/skeletonmage_bone_41
+    400078: creature/skeletonmage/skeletonmage_bone_42
+    400080: creature/skeletonmage/skeletonmage_bone_43
+    400082: creature/skeletonmage/skeletonmage_bone_44
+    400084: creature/skeletonmage/skeletonmage_bone_45
+    400086: creature/skeletonmage/skeletonmage_bone_46
+    400088: creature/skeletonmage/skeletonmage_bone_47
+    400090: creature/skeletonmage/skeletonmage_bone_48
+    400092: creature/skeletonmage/skeletonmage_bone_49
+    400094: creature/skeletonmage/skeletonmage_bone_5
+    400096: creature/skeletonmage/skeletonmage_bone_50
+    400098: creature/skeletonmage/skeletonmage_bone_51
+    400100: creature/skeletonmage/skeletonmage_bone_52
+    400102: creature/skeletonmage/skeletonmage_bone_53
+    400104: creature/skeletonmage/skeletonmage_bone_54
+    400106: creature/skeletonmage/skeletonmage_bone_55
+    400108: creature/skeletonmage/skeletonmage_bone_56
+    400110: creature/skeletonmage/skeletonmage_bone_57
+    400112: creature/skeletonmage/skeletonmage_bone_58
+    400114: creature/skeletonmage/skeletonmage_bone_59
+    400116: creature/skeletonmage/skeletonmage_bone_6
+    400118: creature/skeletonmage/skeletonmage_bone_60
+    400120: creature/skeletonmage/skeletonmage_bone_61
+    400122: creature/skeletonmage/skeletonmage_bone_62
+    400124: creature/skeletonmage/skeletonmage_bone_63
+    400126: creature/skeletonmage/skeletonmage_bone_64
+    400128: creature/skeletonmage/skeletonmage_bone_65
+    400130: creature/skeletonmage/skeletonmage_bone_66
+    400132: creature/skeletonmage/skeletonmage_bone_67
+    400134: creature/skeletonmage/skeletonmage_bone_68
+    400136: creature/skeletonmage/skeletonmage_bone_69
+    400138: creature/skeletonmage/skeletonmage_bone_7
+    400140: creature/skeletonmage/skeletonmage_bone_70
+    400142: creature/skeletonmage/skeletonmage_bone_71
+    400144: creature/skeletonmage/skeletonmage_bone_72
+    400146: creature/skeletonmage/skeletonmage_bone_73
+    400148: creature/skeletonmage/skeletonmage_bone_74
+    400150: creature/skeletonmage/skeletonmage_bone_75
+    400152: creature/skeletonmage/skeletonmage_bone_76
+    400154: creature/skeletonmage/skeletonmage_bone_77
+    400156: creature/skeletonmage/skeletonmage_bone_78
+    400158: creature/skeletonmage/skeletonmage_bone_79
+    400160: creature/skeletonmage/skeletonmage_bone_8
+    400162: creature/skeletonmage/skeletonmage_bone_80
+    400164: creature/skeletonmage/skeletonmage_bone_81
+    400166: creature/skeletonmage/skeletonmage_bone_82
+    400168: creature/skeletonmage/skeletonmage_bone_83
+    400170: creature/skeletonmage/skeletonmage_bone_84
+    400172: creature/skeletonmage/skeletonmage_bone_9
+    400174: //RootNode
+    2100000: creature_skeletonmage_skeletonmage_0
+    2100002: creature_skeletonmage_skeletonmage_1
+    2100004: creature_skeletonmage_skeletonmage_2
+    4300000: creature/skeletonmage/skeletonmage
+    7400000: Walk [0]
+    7400002: Run [1]
+    7400004: Stand [2]
+    7400006: SpellCast [5]
+    7400008: Death [10]
+    7400010: ReadySpellOmni [12]
+    7400012: ReadySpellDirected [11]
+    7400014: SpellCastDirected [13]
+    7400016: ChannelCastDirected [14]
+    7400018: ChannelCastOmni [15]
+    7400020: SpellCastOmni [16]
+    9500000: //RootNode
+    13700000: creature/skeletonmage/skeletonmage
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: creature_skeletonmage_skeletonmage_0
+    second: {fileID: 2100000, guid: 36b25c198725f4444a814abcedc46e23, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: creature_skeletonmage_skeletonmage_1
+    second: {fileID: 2100000, guid: a0618fc38f7f0469c9fb12051518b775, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: creature_skeletonmage_skeletonmage_2
+    second: {fileID: 2100000, guid: d36e39306b17f4995aee93f7da057a14, type: 2}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: skeletonmage
+    second: {fileID: 2800000, guid: 65d891bb9decd45e89d4c107787ea0db, type: 3}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    previousCalculatedGlobalScale: 0.01
+    hasPreviousCalculatedGlobalScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

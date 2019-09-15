@@ -20,6 +20,7 @@ namespace CharacterControllers {
         private GameObject floatingHealthBar;
         private FloatingHealthBar healthBarCtr;
         private bool isInBattleStatus;
+        private GameObject pointedIndicator;
 
         
         public int attackRange;
@@ -61,6 +62,7 @@ namespace CharacterControllers {
             floatingHealthBar = Instantiate(floatingHealthBarPrefab, transform);
             healthBarCtr = floatingHealthBar.GetComponent<FloatingHealthBar>();
             healthBarCtr.setHealthBarAttrib(floatingHealthBarUpwardsOffset);
+            pointedIndicator = transform.Find("pointed").gameObject;
         }
 
         private void getAttackAnimationLength()
@@ -160,6 +162,16 @@ namespace CharacterControllers {
         public void receiveSpell(Spell spell) {
             if(!isInBattleStatus) alertGroup();
             characterStatus.onReceivingSpell(spell);
+        }
+
+        public void enablePointedIndicator() {
+            Debug.Log("setting it to be active");
+            pointedIndicator.SetActive(true);
+        }
+
+        public void disablePointedIndicator() {
+            Debug.Log("setting it to be inactive");
+            pointedIndicator.SetActive(false);
         }
     }
 }
