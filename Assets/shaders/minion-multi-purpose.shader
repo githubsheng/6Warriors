@@ -11,6 +11,7 @@
         Tags { "RenderType"="Opaque" }
         LOD 200
         
+        //render double sides of a surface.
         //render back faces first
         Cull Front
         CGPROGRAM

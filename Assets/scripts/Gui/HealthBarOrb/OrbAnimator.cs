@@ -4,8 +4,7 @@ using UnityEngine.UI;
 namespace guiraffe.SubstanceOrb
 {
     [RequireComponent(typeof(Image))]
-    public class OrbAnimator : OrbBehaviour
-    {
+    public class OrbAnimator : OrbBehaviour {
         [Range(-1.0f, 1.0f)] public float Multiplier = 1.0f;
 
         public Vector2 Smoke1Speed = new Vector2(0.05f, 0.1f);
@@ -31,11 +30,11 @@ namespace guiraffe.SubstanceOrb
 
         void Update()
         {
-            smoke1Offset += Multiplier * Time.deltaTime * Smoke1Speed;
-            smoke2Offset += Multiplier * Time.deltaTime * Smoke2Speed;
-            particles1Offset += Multiplier * Time.deltaTime * Particles1Speed;
-            particles2Offset += Multiplier * Time.deltaTime * Particles2Speed;
-            surfaceOffset += Multiplier * Time.deltaTime * SurfaceSpeed;
+            smoke1Offset += Multiplier * Time.deltaTime * timeScaleOffset * Smoke1Speed;
+            smoke2Offset += Multiplier * Time.deltaTime * timeScaleOffset * Smoke2Speed;
+            particles1Offset += Multiplier * Time.deltaTime * timeScaleOffset * Particles1Speed;
+            particles2Offset += Multiplier * Time.deltaTime * timeScaleOffset * Particles2Speed;
+            surfaceOffset += Multiplier * Time.deltaTime * timeScaleOffset * SurfaceSpeed;
 
             Material.SetFloat("_Smoke1OffsetX", smoke1Offset.x);
             Material.SetFloat("_Smoke1OffsetY", smoke1Offset.y);

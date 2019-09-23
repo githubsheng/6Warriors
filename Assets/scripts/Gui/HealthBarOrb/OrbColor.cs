@@ -33,7 +33,7 @@ namespace guiraffe.SubstanceOrb
             Color currentSurfaceColor = Material.GetColor(OrbVariable.SURFACE_COLOR);
             Color currentAccentColor = Material.GetColor(OrbVariable.ACCENT_COLOR);
             Color currentBaseColor = Material.GetColor(OrbVariable.BASE_COLOR);
-            float rate = Time.deltaTime * AnimationSpeed;
+            float rate = Time.deltaTime * timeScaleOffset * AnimationSpeed;
             SetColors(Color.Lerp(currentSurfaceColor, SurfaceColor, rate), Color.Lerp(currentAccentColor, AccentColor, rate), Color.Lerp(currentBaseColor, BaseColor, rate));
         }
 

@@ -6,6 +6,8 @@ namespace guiraffe.SubstanceOrb
     [RequireComponent(typeof(Image))]
     public class OrbBehaviour : MonoBehaviour
     {
+        protected float timeScaleOffset = 1f;
+        
         Material material;
 
         protected Material Material
@@ -35,6 +37,14 @@ namespace guiraffe.SubstanceOrb
         Image Image
         {
             get { return GetComponent<Image>(); }
+        }
+        
+        public void setTimeScaleOffset(float offset) {
+            this.timeScaleOffset = offset;
+        }
+
+        public void removeTimeScaleOffset() {
+            this.timeScaleOffset = 1f;
         }
     }
 }

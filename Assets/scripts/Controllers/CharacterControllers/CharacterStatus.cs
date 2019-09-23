@@ -10,7 +10,11 @@ namespace CharacterControllers
     public class CharacterStatus
     {
         public int playerLevel = 1;
-        public float weaponAddition = 0;
+        //todo: should provide methods to add/subtract weapon addition, gear hp/mana regeration
+        //todo: these methods are called when we put on/off gears.
+        public float gearAttackStrengh = 0;
+        public float gearHpRegerationPerSecond = 0;
+        public float gearManaRegerationPerSecond = 0;
         public float armor;
         public float maxBaseHp;
         public float maxBaseMana;
@@ -26,12 +30,11 @@ namespace CharacterControllers
         public float hp;
         public float mana;
         public float attackStrengh;
-        public float poisonResistence;
+        public float holyResistence;
         public float fireResistence;
         public float iceResistence;
         public bool isDead;
-        public int isPoisoned;
-    
+        public float vulnerability = 1f;
         private float _expectedNextEvaluationTime;
     
         //includes debuffs
@@ -49,7 +52,6 @@ namespace CharacterControllers
             maxHp = maxBaseHp;
             maxMana = maxBaseMana;
             this.baseAttackStrengh = baseAttackStrengh;
-            //todo: a way to set weapon addition and update the attack strength.
             this.attackStrengh = baseAttackStrengh;
             baseHpRegerationPerSecond = 3;
             baseManaRegeratoinPerSecond = 3;
@@ -61,72 +63,54 @@ namespace CharacterControllers
             float damage = effect.attackStrength - armor;
             if (effect.magicType == Spell.MAGIC_TYPE_ICE) damage -= iceResistence;
             if (effect.magicType == Spell.MAGIC_TYPE_FIRE) damage -= fireResistence;
-            if (effect.magicType == Spell.MAGIC_TYPE_POISION) damage -= poisonResistence;
-            return damage;
+            if (effect.magicType == Spell.MAGIC_TYPE_HOLY) damage -= holyResistence;
+            return damage * vulnerability;
         }
 
     
         public void onReceivingSpell(Spell spell)
         {
-            if (spell.buff != null)
-            {
-                //todo: check if spell is already there. if it is, simply reset its duration
-                buffs.Add(spell.buff);
-                spell.buff.onAddingBuffer(this);
-            }
             hp -=  calculateReceivedDamage(spell);
             if (hp <= 0)
             {
                 isDead = true;
-                resetStatus();
             }
         }
     
-        private void resetStatus()
-        {
-            buffs = new List<CharacterBuff>();
-        } 
-    
-        public bool reEvaluateStatusEverySecond()
+        public void reEvaluateStatusEverySecond()
         {
             float now = Time.time;
-            if (now < _expectedNextEvaluationTime) return false;
+            if (now < _expectedNextEvaluationTime) return;
     
             _expectedNextEvaluationTime += 1;
             
-            hp += baseHpRegerationPerSecond;
-            mana += baseManaRegeratoinPerSecond;
-           
-            List<CharacterBuff> validBuffs = new List<CharacterBuff>(buffs.Count);
-    
-            for (int i = 0; i < buffs.Count; i++)
-            {
-                CharacterBuff characterBuff = buffs[i];
-                if (characterBuff.isExpired())
-                {
-                    //this buff has expired, we need to revert all the effects of this buff
-                    characterBuff.onRemovingBuffer(this);
-                }
-                else
-                {
-                    if (characterBuff.isEffective()) characterBuff.onBufferBecomeEffective(this);
-                    validBuffs.Add(characterBuff);
-                }
-            }
-    
-            buffs = validBuffs;         
-            //when we remove a buff that increase max hp, the current hp may be higher than new max hp.
-            hp = Math.Min(hp, maxHp);
-            mana = Math.Min(mana, maxMana);
+            hp = hp + baseHpRegerationPerSecond + gearHpRegerationPerSecond;
+            mana = mana + baseManaRegeratoinPerSecond + gearManaRegerationPerSecond;
+
+            //cos hp / man keeps regerating
+            hp = Math.Min(maxHp, hp);
+            mana = Math.Min(maxMana, mana);
 
             if (hp <= 0)
             {
-                resetStatus();
                 isDead = true;
             }
-            return true;
         }
-        
+
+
+        public void changeHp(float change) {
+            hp += change;
+            hp = Math.Min(maxHp, hp);
+            if (hp <= 0)
+            {
+                isDead = true;
+            }
+        }
+
+        public void changeMana(float change) {
+            mana += change;
+            mana = Math.Min(maxMana, mana);
+        }
     }    
 }
 

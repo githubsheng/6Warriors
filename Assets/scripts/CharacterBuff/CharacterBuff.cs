@@ -8,27 +8,22 @@ namespace Buffs
 {
     public abstract class CharacterBuff
     {
+        //same buff may be accumulated. if 0, means, buffer cannot be accumulated
+        public int count;
+        //todo: make these int to floats....
+
         //these are one time effects, ie, only applied once
         public int maxHpChange;
         public int maxManaChange;
         public int attackStrenghChange;
         public int magicPowerChange;
         public int armorChange;
-        public int magicResistenceChange;
-        public int fireResistenceChange;
-        public int iceResistenceChange;
-        public int dodgeChanceChange;
 
         //these effects are applied every time the buff become effective
-        public int hpIncrease;
-        public int manaIncrease;
-        //the decrease needs to be negative
-        public int hpDecrease;
-        public int manaDecrease;
+        public int hpChange;
+        public int manaChange;
     
         public string name;
-        //todo: need to think about it.
-        public string buffIconName;
         public bool isDebuff;
         public string explaination;
     
@@ -37,13 +32,9 @@ namespace Buffs
         public float buffExpireTime;
         public float nextEffectiveTime;
 
-        public int makeBlind;
-        public int makePerified;
-
-        public CharacterBuff(string name, string buffIconName, bool isDebuff, string explaination, float durationInSeconds)
+        public CharacterBuff(string name, bool isDebuff, string explaination, float durationInSeconds)
         {
             this.name = name;
-            this.buffIconName = buffIconName;
             this.isDebuff = isDebuff;
             this.explaination = explaination;
             this.durationInSeconds = durationInSeconds;
@@ -60,8 +51,8 @@ namespace Buffs
             return buffExpireTime < Time.time;
         }
 
-        public bool isEffective()
-        {
+        public bool isEffective() {
+            if (intervalInSeconds == 0) return true;
             return nextEffectiveTime < Time.time;
         }
 
@@ -69,12 +60,6 @@ namespace Buffs
         {
             nextEffectiveTime += intervalInSeconds;
         }
-
-        public abstract void onAddingBuffer(CharacterStatus status);
-
-        public abstract void onRemovingBuffer(CharacterStatus status);
-
-        public abstract void onBufferBecomeEffective(CharacterStatus status);
 
     }
 }

@@ -22,7 +22,7 @@ public class OrbFill : OrbBehaviour
 
     void Update()
     {
-        float rate = Time.deltaTime * AnimationSpeed;
+        float rate = Time.deltaTime * timeScaleOffset * AnimationSpeed;
         Material.SetFloat(OrbVariable.FILL, Mathf.Lerp(Material.GetFloat(OrbVariable.FILL), Fill, rate));
     }
 }

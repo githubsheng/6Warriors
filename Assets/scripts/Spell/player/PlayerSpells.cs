@@ -1,70 +1,83 @@
+using Buffs.player;
 using CharacterControllers;
 using UnityEngine;
 
 namespace Spells.ArrowAttack {
     public class PlayerSpells {
 
-        private static Spell getBaseDemonArrow(GameObject prefab) {
+        private static Spell getBaseDemonArrow(GameObject prefab, GameObject originPrefab) {
             return new Spell {
+                name = "demon_arrow",
                 attackStrength = 10f,
                 manaGenerated = 5f,
-                prefab = prefab
+                prefab = prefab,
+                originPrefab = originPrefab
             };
         }
         
-        private static Spell getBaseFireArrow(GameObject prefab) {
+        private static Spell getBaseHolyArrow(GameObject prefab, GameObject originPrefab) {
             return new Spell {
+                name = "holy_arrow",
                 attackStrength = 18f,
                 manaConsumed = 3f,
-                magicType = Spell.MAGIC_TYPE_FIRE,
-                prefab = prefab
+                magicType = Spell.MAGIC_TYPE_HOLY,
+                prefab = prefab,
+                originPrefab = originPrefab,
+                buff = new HolyStack()
             };
         }
         
-        private static Spell getBaseIceArrow(GameObject prefab) {
+        private static Spell getBaseIceArrow(GameObject prefab, GameObject originPrefab) {
             return new Spell {
+                name = "ice_arrow",
                 attackStrength = 18f,
                 manaConsumed = 2f,
                 magicType = Spell.MAGIC_TYPE_ICE,
-                prefab = prefab
+                prefab = prefab,
+                originPrefab = originPrefab,
+                buff = new Frozen()
             };
         }
         
-        private static Spell getBasePoisonArrow(GameObject prefab) {
+        private static Spell getBaseTripleArrows(GameObject prefab, GameObject originPrefab) {
             return new Spell {
-                attackStrength = 15,
+                name = "triple_arrows",
+                attackStrength = 18f,
                 manaConsumed = 2f,
-                magicType = Spell.MAGIC_TYPE_POISION,
-                prefab = prefab
+                penetration = 4,
+                magicType = Spell.MAGIC_TYPE_ICE,
+                prefab = prefab,
+                originPrefab = originPrefab
             };
         }
+        
 
         private static void adjustStrength(Spell spell, CharacterStatus characterStatus) {
             spell.attackStrength += characterStatus.playerLevel - 1; 
-            spell.attackStrength += characterStatus.weaponAddition;
+            spell.attackStrength += characterStatus.gearAttackStrengh;
         }
 
-        public static Spell getDemonArrow(CharacterStatus characterStatus, GameObject prefab) {
-            Spell spell = getBaseDemonArrow(prefab);
+        public static Spell getDemonArrow(CharacterStatus characterStatus, GameObject prefab, GameObject originPrefab) {
+            Spell spell = getBaseDemonArrow(prefab, originPrefab);
             adjustStrength(spell, characterStatus);
             return spell;
         }
         
-        public static Spell getFireArrow(CharacterStatus characterStatus, GameObject prefab) {
-            Spell spell = getBaseFireArrow(prefab);
+        public static Spell getHolyArrow(CharacterStatus characterStatus, GameObject prefab, GameObject originPrefab) {
+            Spell spell = getBaseHolyArrow(prefab, originPrefab);
             adjustStrength(spell, characterStatus);
             return spell;
         }
 
         
-        public static Spell getIceArrow(CharacterStatus characterStatus, GameObject prefab) {
-            Spell spell = getBaseIceArrow(prefab);
+        public static Spell getIceArrow(CharacterStatus characterStatus, GameObject prefab, GameObject originPrefab) {
+            Spell spell = getBaseIceArrow(prefab, originPrefab);
             adjustStrength(spell, characterStatus);
             return spell;
         }
         
-        public static Spell getPoisonArrow(CharacterStatus characterStatus, GameObject prefab) {
-            Spell spell = getBasePoisonArrow(prefab);
+        public static Spell getTripleArrows(CharacterStatus characterStatus, GameObject prefab, GameObject originPrefab) {
+            Spell spell = getBaseTripleArrows(prefab, originPrefab);
             adjustStrength(spell, characterStatus);
             return spell;
         }

@@ -26,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 26539851}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.7, z: 0}
+  m_LocalPosition: {x: 0, y: 1.31, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2577700882632633431}
@@ -79,7 +79,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 531458343}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.7, z: 0}
+  m_LocalPosition: {x: 0, y: 1.31, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2577700882632633431}
@@ -130,7 +130,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1929836786}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.204, y: 1.7, z: 0.54}
+  m_LocalPosition: {x: 0.204, y: 1.31, z: 0.48}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2577700882632633431}
@@ -215,9 +215,9 @@ CapsuleCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   m_Radius: 0.5
-  m_Height: 2.4
+  m_Height: 2
   m_Direction: 1
-  m_Center: {x: 0, y: 1.25, z: 0}
+  m_Center: {x: 0, y: 1.1, z: 0}
 --- !u!143 &1191296977
 CharacterController:
   m_ObjectHideFlags: 0
@@ -229,13 +229,13 @@ CharacterController:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Height: 2.4
+  m_Height: 2
   m_Radius: 0.5
   m_SlopeLimit: 45
   m_StepOffset: 0.6
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 1.25, z: 0}
+  m_Center: {x: 0, y: 1.1, z: 0}
 --- !u!114 &1191296978
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -248,6 +248,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 586724bbfb1d4003abed02b66614cefb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  slowModeIndicator: {fileID: 0}
   runAnimationVal: 22
   idleAnimationVal: 155
   readyAnimationVal: 20
@@ -256,17 +257,21 @@ MonoBehaviour:
   dieAnimationVal: 61
   maxBaseHp: 100
   maxBaseMana: 100
-  baseAttackStrength: 50
+  baseAttackStrength: 5
   baseMagicPower: 0
   camRayLength: 100
   movementSpeed: 7
-  demonArrowPrefab: {fileID: 4214838243535564070, guid: 3e9a002307fc949a6abd9b15fdec565c,
+  demonArrowPrefab: {fileID: 5214623146824312380, guid: cf3c2bcf4582d496b828bb4ca80688ed,
     type: 3}
-  fireArrowPrefab: {fileID: 7432694598718285855, guid: c29ec49250c40487db1dba8a92078687,
+  demonArrowOriginPrefab: {fileID: 2523609231379801374, guid: b717746b0f561406faed0858c307ce24,
     type: 3}
-  iceArrowPrefab: {fileID: 54433389791835820, guid: 71b440df7d1e24131a90aba1c7ba1f68,
+  holyArrowPrefab: {fileID: 3614576353042838240, guid: c16f7dc5538ce41c8b45657d09c26ef2,
     type: 3}
-  poisonArrowPrefab: {fileID: 7037187407442897889, guid: 6f45ced04b74c4751af0d1a89ba0c83a,
+  holyArrowOriginPrefab: {fileID: 5339642937347154313, guid: e1f84dd1754e24fc98666c01b4641199,
+    type: 3}
+  iceArrowPrefab: {fileID: 2943582233671279977, guid: a3958c1d7eed74adb9cc03f251adb88b,
+    type: 3}
+  iceArrowOriginPrefab: {fileID: 5909600438785031255, guid: 1e7929a6222e14c1b81763e96b36e7a0,
     type: 3}
 --- !u!1 &5929429289842806666
 GameObject:
@@ -368,15 +373,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400494, guid: 33794589ef33e48f7b9f3e152afb50f4, type: 3}
       propertyPath: m_LocalScale.x
-      value: 2.5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 400494, guid: 33794589ef33e48f7b9f3e152afb50f4, type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 400494, guid: 33794589ef33e48f7b9f3e152afb50f4, type: 3}
       propertyPath: m_LocalScale.z
-      value: 2.5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 9500000, guid: 33794589ef33e48f7b9f3e152afb50f4, type: 3}
       propertyPath: m_Controller
