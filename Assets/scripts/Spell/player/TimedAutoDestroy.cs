@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Spells.ArrowAttack {
+namespace Spells {
     public class TimedAutoDestroy : MonoBehaviour {
 
         public float destroyAfterSeconds;

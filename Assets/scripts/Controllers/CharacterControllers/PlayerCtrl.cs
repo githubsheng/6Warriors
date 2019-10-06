@@ -1,4 +1,7 @@
-using System.Numerics;
+using System.Collections;
+using System.Collections.Generic;
+using Buffs;
+using Buffs.player;
 using guiraffe.SubstanceOrb;
 using Spells;
 using Spells.ArrowAttack;
@@ -16,6 +19,7 @@ namespace CharacterControllers {
         private CharacterController unityCharacterController;
         
         private int commonAnimationParam = Animator.StringToHash("animationStatus");
+        private static readonly int PowerShotTrigger = Animator.StringToHash("powerShotTrigger");
 
         private int turnDetectionMask = 1 << 10;
         private int arrowDirectionMask = 1 << 11;
@@ -35,16 +39,23 @@ namespace CharacterControllers {
         private float gravity = 60f;
 
         private float slowModeUntil = float.MaxValue;
-        public Image slowModeIndicator;
+
+        private GameObject iceShieldInstance;
+        private Dictionary<string, CharacterBuff> selfBuffers = new Dictionary<string, CharacterBuff>();
         
         private Camera mainCamera;
+
         
+        
+        public Image slowModeIndicator;
         public int runAnimationVal;
         //todo: if no input for a time, go back to idle mode
         public int idleAnimationVal;
         public int readyAnimationVal;
         public int attack01AnimationVal;
         public int attack02AnimationVal;
+        //when doing powershot, set commonAnimationParam to this so that animation does not enter any other state.
+        private int invalidAnimationValForPowerShot = -1;
         public int dieAnimationVal;
         
         public float maxBaseHp;
@@ -62,7 +73,18 @@ namespace CharacterControllers {
         public GameObject holyArrowOriginPrefab;
         public GameObject iceArrowPrefab;
         public GameObject iceArrowOriginPrefab;
-        
+        public GameObject iceShieldPrefab;
+
+
+        public GameObject powerShotWingsPrefab;
+        public GameObject powerShotArrowPrefab;
+        public GameObject powerShotOriginPrefab;
+        private Vector3 powerWingsLocalAdjustment = new Vector3(0, 0.479f, -0.366f);
+        public float powerShotInterval;
+        public float powerShotArrowSpawnDelay;
+
+        public GameObject darkTrapPrefab;
+
         private void Start() {
             unityCharacterController = gameObject.GetComponent<CharacterController>();
             animator = gameObject.GetComponentInChildren<Animator>();
@@ -80,8 +102,8 @@ namespace CharacterControllers {
         private float getAttackAnimationLength() {
             AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
             for (int i = 0; i < clips.Length; i++) {
-                if (clips[i].name == "AttackCrossbow_fixed [10]") {
-                    return clips[i].length;
+                if (clips[i].name == "AttackSeq01") {
+                    return clips[i].length / 1.5f;
                 }
             }
             return 100f;
@@ -91,6 +113,7 @@ namespace CharacterControllers {
             if(Time.time > slowModeUntil) outOfSlowMode();
             
             characterStatus.reEvaluateStatusEverySecond();
+            reEvaluateBuff();
             hpOrbFill.Fill = characterStatus.hp / characterStatus.maxHp;
             mpOrbFill.Fill = characterStatus.mana / characterStatus.maxMana;
             if (characterStatus.isDead) {
@@ -106,7 +129,7 @@ namespace CharacterControllers {
         }
         
         private bool isAttackKeyPressed() {
-            return Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.E) || Input.GetKey(KeyCode.F);
+            return Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.E) || Input.GetKey(KeyCode.F) || Input.GetKey(KeyCode.A);
         }
         
         private void tryBecomeReady() {
@@ -115,6 +138,7 @@ namespace CharacterControllers {
         }
 
         private void tryTurn() {
+            if (Time.time <= freezeUntil) return;
             if (Input.GetKey(KeyCode.Space) || isAttackKeyPressed()) {
                 Ray camRay = mainCamera.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hit;
@@ -145,17 +169,40 @@ namespace CharacterControllers {
             moveDirection.y = -gravity * Time.deltaTime;
             unityCharacterController.Move(moveDirection * Time.deltaTime);
         }
+                
+        private IEnumerator executeSpellAfter(Spell spell, float delay, Vector3 spawnPos, Vector3 hitToSpawn)
+        {
+            yield return new WaitForSeconds(delay);
+            spawnArrow(spell, spawnPos, hitToSpawn);
+            if (spell.originPrefab) Instantiate(spell.originPrefab, spawnPos, Quaternion.LookRotation(hitToSpawn));
+        }
+
+        private IEnumerator executeTripleArrowAfter(Spell spell, float delay, Vector3 spawnPos, Vector3 hitToSpawn)
+        {
+            yield return new WaitForSeconds(delay);
+            spawnArrow(spell, spawnPos, hitToSpawn);
+            //need to instantiate two more...
+            Vector3 slightlyLeft = Quaternion.AngleAxis(-10f, Vector3.up) * hitToSpawn;
+            spawnArrow(spell, spawnPos, slightlyLeft);
+            Vector3 slightlyRight = Quaternion.AngleAxis(10f, Vector3.up) * hitToSpawn;
+            spawnArrow(spell, spawnPos, slightlyRight);
+            if (spell.originPrefab) Instantiate(spell.originPrefab, spawnPos, Quaternion.LookRotation(hitToSpawn));
+        }
+
+        private void spawnArrow(Spell spell, Vector3 spawnPos, Vector3 hitToSpawn) {
+            GameObject arrow = Instantiate(spell.prefab, spawnPos, Quaternion.LookRotation(hitToSpawn));
+            ArrowAttack arrowAttack = arrow.GetComponent<ArrowAttack>();
+            arrowAttack.setAttackAttrib(spell, hitToSpawn);  
+        }
         
-        private void castSpell(Spell spell, int animationVal) {
+        private void castSpell(Spell spell, float delayAfterAnimationPlay) {
             characterStatus.mana -= (int)spell.manaConsumed;
             characterStatus.mana += (int) spell.manaGenerated;
-            animator.SetInteger(commonAnimationParam, animationVal);
             Vector3 spawnPos = arrowSpawnPos.position;
             //todo: first we need to check if the mouse is pointing at a enemy, only if it missed out, will we
             //todo: resolve to direction mask.
             Ray camRay = mainCamera.ScreenPointToRay(Input.mousePosition);
-            Vector3 hitPos;
-            bool characterHitRes;            
+            Vector3 hitPos;          
             RaycastHit characterHit;
             if (Physics.Raycast(camRay, out characterHit, camRayLength, charactersMask)) {
                 hitPos = characterHit.point;
@@ -169,23 +216,12 @@ namespace CharacterControllers {
             Vector3 hitToSpawn = hitPos - spawnPos;
             hitToSpawn.y = 0;
             hitToSpawn = Vector3.Normalize(hitToSpawn);
-            GameObject arrow = Instantiate(spell.prefab, spawnPos, Quaternion.LookRotation(hitToSpawn));
-            ArrowAttack arrowAttack = arrow.GetComponent<ArrowAttack>();
-            arrowAttack.setAttackAttrib(spell, hitToSpawn);  
             if (spell.name.Equals("triple_arrows")) {
-                Debug.Log("creating more...");
-                //need to instantiate two more...
-                Vector3 slightlyLeft = Quaternion.AngleAxis(-10f, Vector3.up) * hitToSpawn;
-                GameObject arrow2 = Instantiate(spell.prefab, spawnPos, Quaternion.LookRotation(slightlyLeft));
-                ArrowAttack arrowAttack2 = arrow2.GetComponent<ArrowAttack>();
-                arrowAttack2.setAttackAttrib(spell, slightlyLeft);
-
-                Vector3 slightlyRight = Quaternion.AngleAxis(10f, Vector3.up) * hitToSpawn;
-                GameObject arrow3 = Instantiate(spell.prefab, spawnPos, Quaternion.LookRotation(slightlyRight));
-                ArrowAttack arrowAttack3 = arrow3.GetComponent<ArrowAttack>();
-                arrowAttack3.setAttackAttrib(spell, slightlyRight);  
+                StartCoroutine(executeTripleArrowAfter(spell, delayAfterAnimationPlay, spawnPos, hitToSpawn));
             }
-            if(spell.originPrefab) Instantiate(spell.originPrefab, spawnPos, Quaternion.LookRotation(hitToSpawn));
+            else {
+                StartCoroutine(executeSpellAfter(spell, delayAfterAnimationPlay, spawnPos, hitToSpawn));                
+            }
         }
 
         private void tryAttack() {
@@ -194,20 +230,39 @@ namespace CharacterControllers {
             if (Time.timeScale < 1f) outOfSlowMode();
             Spell spell = getSpell();
             if (characterStatus.mana < spell.manaConsumed) return;
-            freezeUntil = Time.time + attackInterval;
+            if (spell.name.Equals("power_shot")) {
+                freezeUntil = Time.time + powerShotInterval;
+                GameObject wings = Instantiate(powerShotWingsPrefab, transform);
+                Instantiate(powerShotOriginPrefab, arrowSpawnPos.position, arrowSpawnPos.rotation);
+                wings.transform.localPosition = powerWingsLocalAdjustment;
+                animator.SetInteger(commonAnimationParam, invalidAnimationValForPowerShot);
+                animator.SetTrigger(PowerShotTrigger);
+                castSpell(spell, powerShotArrowSpawnDelay);
+            } else {
+                //todo: attackInterval, needs to be spell specific..? or maybe we have common attackInterval, because powershot has a different interval
+                freezeUntil = Time.time + attackInterval;
+                int attackAnimVal = getAttackAnimationVal();
+                animator.SetInteger(commonAnimationParam, attackAnimVal);
+                //attack interval is the attack animation length (see how it is calculated). and I need the arrow
+                //to be spawned at nearly the end of the attack animation.
+                castSpell(spell, attackInterval - 0.1f);         
+            }
+        }
+
+        private int getAttackAnimationVal() {
             //check the animator controller to see how this code make sense...
             //TODO: add comments about the weird behaviors
             AnimatorStateInfo currentAnimation = animator.GetCurrentAnimatorStateInfo(0);
-            if (currentAnimation.IsName("AttackCrossbow [10]")) {
-                castSpell(spell, attack02AnimationVal);                
-            } else {
-                castSpell(spell, attack01AnimationVal);   
-            }
+            return currentAnimation.IsName("Attack01") ? attack02AnimationVal : attack01AnimationVal;
         }
 
         private void trySpecialSpell() {
             if (Input.GetKeyUp(KeyCode.D)) {
                 intoSlowMode();
+            } else if (Input.GetKeyUp(KeyCode.S)) {
+                addBuff(new IceShield());
+            } else if (Input.GetKeyUp(KeyCode.X)) {
+                Instantiate(darkTrapPrefab, transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
             }
         }
 
@@ -251,6 +306,8 @@ namespace CharacterControllers {
                 return PlayerSpells.getHolyArrow(characterStatus, holyArrowPrefab, holyArrowOriginPrefab);
             } else if (Input.GetKey(KeyCode.E)) {
                 return PlayerSpells.getIceArrow(characterStatus, iceArrowPrefab, iceArrowOriginPrefab);
+            } else if (Input.GetKey(KeyCode.A)) {
+                return PlayerSpells.getPowerShot(characterStatus, powerShotArrowPrefab);
             } else {
                 //is F, supposed to be penetration, but for now holy so it compiles
                 return PlayerSpells.getTripleArrows(characterStatus, demonArrowPrefab, demonArrowOriginPrefab);
@@ -259,6 +316,54 @@ namespace CharacterControllers {
         
         public void receiveSpell(Spell spell) {
             characterStatus.onReceivingSpell(spell);
+        }
+        
+         private void addBuff(CharacterBuff newBuff) {
+            selfBuffers.Add(newBuff.name, newBuff);
+            switch (newBuff.name) {
+                case "ice_shield":
+                    iceShieldInstance = Instantiate(iceShieldPrefab, transform);
+                    break;
+                case "recover":
+                    //todo: others
+                    break;
+            }
+        }
+
+        private void removeBuff(string bufferName) {
+            selfBuffers.Remove(bufferName);
+            switch (bufferName) {
+                case "ice_shield":
+                    Destroy(iceShieldInstance);
+                    break;
+                case "recover":
+                    break;
+            }  
+        }
+
+
+        private void reEvaluateBuff() {
+            List<string> needsRemoved = new List<string>();
+            foreach(KeyValuePair<string, CharacterBuff> entry in selfBuffers) {
+                CharacterBuff buffer = entry.Value;
+                if (buffer.isExpired())
+                {
+                    Debug.Log("removing buff due to expire");
+                    needsRemoved.Add(buffer.name);
+                }
+                else
+                {
+                    if (buffer.isEffective()) {
+                        buffer.updateNextEffectiveTime();
+                        characterStatus.changeHp(buffer.hpChange);
+                        characterStatus.changeMana(buffer.manaChange);
+                    }
+                }
+            }
+
+            foreach (string bufferName in needsRemoved) {
+                removeBuff(bufferName);
+            }
         }
         
         private void onKilled()

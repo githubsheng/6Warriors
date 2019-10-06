@@ -2,7 +2,7 @@ using Buffs.player;
 using CharacterControllers;
 using UnityEngine;
 
-namespace Spells.ArrowAttack {
+namespace Spells {
     public class PlayerSpells {
 
         private static Spell getBaseDemonArrow(GameObject prefab, GameObject originPrefab) {
@@ -51,6 +51,16 @@ namespace Spells.ArrowAttack {
             };
         }
         
+        private static Spell getBasePowerShot(GameObject prefab) {
+            return new Spell {
+                name = "power_shot",
+                attackStrength = 100f,
+                manaConsumed = 20f,
+                magicType = Spell.MAGIC_TYPE_ICE,
+                prefab = prefab
+            };
+        }
+        
 
         private static void adjustStrength(Spell spell, CharacterStatus characterStatus) {
             spell.attackStrength += characterStatus.playerLevel - 1; 
@@ -82,6 +92,11 @@ namespace Spells.ArrowAttack {
             return spell;
         }
         
+        public static Spell getPowerShot(CharacterStatus characterStatus, GameObject prefab) {
+            Spell spell = getBasePowerShot(prefab);
+            adjustStrength(spell, characterStatus);
+            return spell;
+        }
 
     }
 }
