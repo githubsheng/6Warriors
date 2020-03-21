@@ -5,7 +5,7 @@ using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
 
-namespace Spells.ArrowAttack {
+namespace Spells {
     public class ArrowAttack : MonoBehaviour {
         private Vector3 direction;
         private Spell spell;
@@ -27,6 +27,7 @@ namespace Spells.ArrowAttack {
         private void OnTriggerEnter(Collider other) {
             if (other.CompareTag("Enemy")) {
                 MinionCtrl ctrl = other.gameObject.GetComponent<MinionCtrl>();
+                if (ctrl.isDead()) return;
                 ctrl.receiveSpell(spell);
                 Instantiate(onHitParticlePreb, transform.position, Quaternion.LookRotation(-transform.forward));
                 spell.penetration--;

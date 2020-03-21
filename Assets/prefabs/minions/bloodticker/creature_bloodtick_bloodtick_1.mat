@@ -35,6 +35,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _DissolveTexture:
+        m_Texture: {fileID: 2800000, guid: 10cfd3e4e462e4667a6e60f09aded42f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _EmissionMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -56,10 +60,12 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - _AlphaReduction: 0
     - _Amount: 0.05
     - _BumpScale: 1
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
+    - _DissolveAmount: 0
     - _DstBlend: 0
     - _GlossMapScale: 1
     - _Glossiness: 0
@@ -76,6 +82,7 @@ Material:
     m_Colors:
     - _AddColor: {r: 0, g: 0, b: 0, a: 0}
     - _Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
+    - _DissolveBorderColor: {r: 0.6603774, g: 0, b: 0.053666495, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 0}
     - _OutlineColor: {r: 1, g: 1, b: 1, a: 1}
     - _TintColor: {r: 1, g: 1, b: 1, a: 1}

@@ -55,12 +55,12 @@ namespace Spells {
             return new Spell {
                 name = "power_shot",
                 attackStrength = 100f,
+                penetration = 99,
                 manaConsumed = 20f,
                 magicType = Spell.MAGIC_TYPE_ICE,
                 prefab = prefab
             };
         }
-        
 
         private static void adjustStrength(Spell spell, CharacterStatus characterStatus) {
             spell.attackStrength += characterStatus.playerLevel - 1; 

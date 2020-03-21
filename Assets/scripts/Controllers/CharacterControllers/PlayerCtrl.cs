@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using Buffs;
 using Buffs.player;
+using Controllers;
 using guiraffe.SubstanceOrb;
 using Spells;
-using Spells.ArrowAttack;
 using UnityEngine;
 using UnityEngine.UI;
 using Quaternion = UnityEngine.Quaternion;
@@ -84,7 +84,10 @@ namespace CharacterControllers {
         public float powerShotArrowSpawnDelay;
 
         public GameObject darkTrapPrefab;
+        public GameObject magicTurretPrefab;
 
+        private CoolDownCtrl coolDownCtrl;
+        
         private void Start() {
             unityCharacterController = gameObject.GetComponent<CharacterController>();
             animator = gameObject.GetComponentInChildren<Animator>();
@@ -97,6 +100,7 @@ namespace CharacterControllers {
             mpOrbAnimator = GameObject.Find("player_mp_fill").GetComponent<OrbAnimator>();
             
             attackInterval = getAttackAnimationLength();
+            coolDownCtrl = GameObject.Find("cool_down_ctrl").GetComponent<CoolDownCtrl>();
         }
 
         private float getAttackAnimationLength() {
@@ -231,6 +235,11 @@ namespace CharacterControllers {
             Spell spell = getSpell();
             if (characterStatus.mana < spell.manaConsumed) return;
             if (spell.name.Equals("power_shot")) {
+                
+                float r = coolDownCtrl.getCooldownRatio("power_shot");
+                if (r > 0f) return;
+                coolDownCtrl.cooldown("power_shot");
+                
                 freezeUntil = Time.time + powerShotInterval;
                 GameObject wings = Instantiate(powerShotWingsPrefab, transform);
                 Instantiate(powerShotOriginPrefab, arrowSpawnPos.position, arrowSpawnPos.rotation);
@@ -258,11 +267,25 @@ namespace CharacterControllers {
 
         private void trySpecialSpell() {
             if (Input.GetKeyUp(KeyCode.D)) {
+                float r = coolDownCtrl.getCooldownRatio("stop_watch");
+                if (r > 0f) return;
+                coolDownCtrl.cooldown("stop_watch");
                 intoSlowMode();
             } else if (Input.GetKeyUp(KeyCode.S)) {
+                float r = coolDownCtrl.getCooldownRatio("ice_shield");
+                if (r > 0f) return;
+                coolDownCtrl.cooldown("ice_shield");
                 addBuff(new IceShield());
             } else if (Input.GetKeyUp(KeyCode.X)) {
+                float r = coolDownCtrl.getCooldownRatio("dark_trap");
+                if (r > 0f) return;
+                coolDownCtrl.cooldown("dark_trap");
                 Instantiate(darkTrapPrefab, transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
+            } else if (Input.GetKeyUp(KeyCode.Z)) {
+                float r = coolDownCtrl.getCooldownRatio("magical_turret");
+                if (r > 0f) return;
+                coolDownCtrl.cooldown("magical_turret");
+                Instantiate(magicTurretPrefab, transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);                
             }
         }
 
@@ -323,6 +346,8 @@ namespace CharacterControllers {
             switch (newBuff.name) {
                 case "ice_shield":
                     iceShieldInstance = Instantiate(iceShieldPrefab, transform);
+                    //todo: need to figure out the proper value here.
+                    characterStatus.armor += 30;
                     break;
                 case "recover":
                     //todo: others
@@ -334,6 +359,8 @@ namespace CharacterControllers {
             selfBuffers.Remove(bufferName);
             switch (bufferName) {
                 case "ice_shield":
+                    //todo: should reset to original rather than just subtract
+                    characterStatus.armor -= 30;
                     Destroy(iceShieldInstance);
                     break;
                 case "recover":

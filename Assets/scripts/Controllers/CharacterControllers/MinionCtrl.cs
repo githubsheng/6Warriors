@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Buffs;
 using Gui.BufferIndicator;
@@ -20,7 +21,6 @@ namespace CharacterControllers {
         private int[] attackAnimationVals;
         private float[] attackAnimationClipLengths;
         private float freezeUntil;
-        private float waitUntilAttackBecomeEffective;
         private GameObject floatingHealthBar;
         private bool isInBattleStatus;
         private GameObject pointedIndicator;
@@ -58,12 +58,16 @@ namespace CharacterControllers {
         public int dieAnimationVal;
         public GameObject bufferIndicatorPrefab;
         public float alertRange;
-        
+
+        private bool onKillCalled;
+        private float deathFadeOutAmount; //0-1
         
         private static readonly int TintColor = Shader.PropertyToID("_TintColor");
         private static readonly Color holyTintColor = new Color(245f / 255, 143f / 255, 98f / 255);
         private static readonly int AddColor = Shader.PropertyToID("_AddColor");
         private static readonly Color frozenAddColor = new Color(111f/255, 111f/255, 111f/255);
+        private static readonly int DissolveAmount = Shader.PropertyToID("_DissolveAmount");
+        public bool alwaysShowPointed;
         
         private void Awake() {
             //todo: hmmm, considering changing this constructor..?
@@ -75,10 +79,10 @@ namespace CharacterControllers {
                 rangedAttackPrefabs[2] = rangedAttackPrefab02;
                 rangedAttackPrefabs[3] = rangedAttackPrefab03;
                 spellSpawnTransform = transform.Find("spell_spawn_pos");
-                attackDelays[1] = attack01EffectiveDelay;
-                attackDelays[2] = attack02EffectiveDelay;
-                attackDelays[3] = attack03EffectiveDelay;
             }
+            attackDelays[1] = attack01EffectiveDelay;
+            attackDelays[2] = attack02EffectiveDelay;
+            attackDelays[3] = attack03EffectiveDelay;
             stopAttackUntil = Time.time;
             
             materials = GetComponentInChildren<Renderer>().materials;
@@ -120,16 +124,21 @@ namespace CharacterControllers {
         }
 
         private void Update() {
+            if (onKillCalled) {
+                //need to play the fadeout effects
+                if (deathFadeOutAmount > 0f && deathFadeOutAmount < 1f) {
+                    foreach (Material material in materials) {
+                        material.SetFloat(DissolveAmount, deathFadeOutAmount);
+                    }                    
+                }
+                //return cos i dont need other logic once the minion has started the "die" process
+                return;
+            }
             if (isInBattleStatus) {
                 reEvaluateBuff();
                 characterStatus.reEvaluateStatusEverySecond();
                 if (characterStatus.isDead) {
                     onKilled();
-                    return;
-                }
-                if(Time.time > waitUntilAttackBecomeEffective)
-                {
-                    this.makeAttackEffective();
                     return;
                 }
                 if (Time.time <= freezeUntil) return;
@@ -199,13 +208,13 @@ namespace CharacterControllers {
             float attackAnimationTime = attackAnimationClipLengths[attackAnimationIdxUsed];
             freezeUntil = Time.time + attackAnimationTime;
             //now attack animation is playing, but we need to wait for a while to make the attack really effective.
-            waitUntilAttackBecomeEffective = Time.time + attackDelays[attackVal];
-
+            StartCoroutine(makeAttackEffective(attackDelays[attackVal]));
         }
 
-        private void makeAttackEffective()
+        private IEnumerator makeAttackEffective(float delay)
         {
-            waitUntilAttackBecomeEffective = float.MaxValue;
+            yield return new WaitForSeconds(delay);
+            //todo: check if player is out of range...?
             Spell spell = Spell.createNormalAttack(characterStatus.attackStrengh);
             if (isRanged)
             {
@@ -232,16 +241,41 @@ namespace CharacterControllers {
             animator.SetInteger(commonAnimationParam, runAnimationVal);
         }
         
-        private void onKilled()
-        {
-            //todo: animation
-//            animator.SetInteger(commonAnimationParam, dieAnimationVal);
+        private void onKilled() {
+            bufferIndicator.enabled = false;
+            removeBuff();
+            onKillCalled = true;
+            agent.isStopped = true;
+            agent.enabled = false;
+            animator.SetInteger(commonAnimationParam, dieAnimationVal);
+            StartCoroutine(fadeOut());
+            StartCoroutine(timedDestroy());
+            pointedIndicator.SetActive(false);
+        }
+
+        private IEnumerator timedDestroy() {
+            yield return new WaitForSeconds(10f);
             Destroy(gameObject);
         }
 
+        private IEnumerator fadeOut() {
+            //wait for the die animation to finish first, typically, it will not be longer than 4s
+            yield return new WaitForSeconds(4f);
+            float elapsedTime = 0;
+            float fadeOutTime = 2f;
+            while (elapsedTime < fadeOutTime)
+            {
+                deathFadeOutAmount = Mathf.Lerp(0f, 1f, elapsedTime / fadeOutTime);
+                elapsedTime += Time.deltaTime;
+                //yield null --> end of the frame
+                //https://answers.unity.com/questions/192438/coroutines-and-lerp-how-to-make-them-friends.html
+                yield return null;
+            }
+        }
+
+
         public void receiveSpell(Spell spell) {
             if (spell.buff != null) {
-                Debug.Log("carries buffer " + spell.buff);
                 CharacterBuff newBuff = spell.buff;
                 if (buffer != null && newBuff.name.Equals(buffer.name)) {
                     buffer.resetExpireTime();
@@ -272,7 +306,6 @@ namespace CharacterControllers {
             buffer = newBuff;
             switch (newBuff.name) {
                 case "holy_stack":
-                    Debug.Log("trying to add buff " + newBuff.name);
                     bufferIndicator.enableSword(newBuff.count);
                     characterStatus.vulnerability = 1.1f;
 
@@ -281,7 +314,6 @@ namespace CharacterControllers {
                     }
                     break;
                 case "frozen":
-                    Debug.Log("trying to add buff " + newBuff.name);
                     bufferIndicator.enableFrost();
                     agent.speed *= 0.6f;
                     animator.SetFloat("walkSpeed", 0.6f);
@@ -334,11 +366,19 @@ namespace CharacterControllers {
         }
         
         public void enablePointedIndicator() {
+            if (alwaysShowPointed) return;
+            if (characterStatus.isDead) return;
             pointedIndicator.SetActive(true);
         }
 
         public void disablePointedIndicator() {
+            if (alwaysShowPointed) return;
             pointedIndicator.SetActive(false);
         }
+
+        public bool isDead() {
+            return characterStatus.isDead;
+        }
+        
     }
 }

@@ -64,6 +64,7 @@ namespace CharacterControllers
             if (effect.magicType == Spell.MAGIC_TYPE_ICE) damage -= iceResistence;
             if (effect.magicType == Spell.MAGIC_TYPE_FIRE) damage -= fireResistence;
             if (effect.magicType == Spell.MAGIC_TYPE_HOLY) damage -= holyResistence;
+            damage = Math.Max(0, damage);
             return damage * vulnerability;
         }
 

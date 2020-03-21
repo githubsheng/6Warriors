@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Spells.ArrowAttack {
+namespace Spells {
     
     public class ArrowSpinning : MonoBehaviour {
         public float spinSpeed;

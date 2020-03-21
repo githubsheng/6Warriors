@@ -1,0 +1,46 @@
+﻿Shader "Custom/ProjectorShader" {
+ Properties {
+  _Color ("Color", Color) = (1,1,1,1)
+  _MainTex ("Albedo (RGB)", 2D) = "white" {}
+ }
+ SubShader {
+  Tags { "Queue" = "Transparent"}
+  LOD 200
+
+  Blend SrcAlpha One
+
+  CGPROGRAM
+  // Physically based Standard lighting model, and enable shadows on all light types
+  #pragma surface surf Lambert vertex:vert noshadow  noambient novertexlights nolightmap nodynlightmap nodirlightmap nofog nometa noforwardadd nolppv noshadowmask
+
+  // Use shader model 3.0 target, to get nicer looking lighting
+  #pragma target 2.0
+
+  float4x4 unity_Projector;
+
+  struct Input {
+   float2 uv_MainTex;
+   float4 posProj : TEXCOORD0;
+  };
+
+  void vert(inout appdata_full v, out Input o) {
+   UNITY_INITIALIZE_OUTPUT(Input, o);
+   o.posProj = mul(unity_Projector, v.vertex);
+  }
+
+  sampler2D _MainTex;
+
+  fixed4 _Color;
+
+  void surf (Input IN, inout SurfaceOutput o) {
+   // Albedo comes from a texture tinted by color
+   //fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
+
+   fixed4 ProRender = tex2Dproj(_MainTex, UNITY_PROJ_COORD(IN.posProj)) * _Color;
+
+   o.Albedo = ProRender;
+  }
+  ENDCG
+ }
+ FallBack ""
+}
